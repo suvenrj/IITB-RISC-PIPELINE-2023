@@ -106,7 +106,7 @@
      - C0
      - 0  - **D2**
      - 1  - **Compliment**
-     - C0= A'B'C'DE + A'B'CD'E
+     - C0= AB' + B'C'DE + B'CD'E
   7. Memory Write
      - wr
      - 0- dont write
@@ -141,7 +141,27 @@
       - C2-0(ADD),1(NAND)=A'B'CD'
       - C1-A'B'C'DEF
       - C0-AB'
-
+  6. M7
+     - OPCODE(ABCD)
+     - CZ FLAG(EF)
+     - C0
+     - 0  - **+2**
+     - 1  - **-6**
+     - C0= ABD' + AC'D'F + AB'EF + AB'DE + AB'CF'
+  6. M8
+     - OPCODE(ABCD)
+     - CZ FLAG(EF)
+     - C0
+     - 0  - **RA**
+     - 1  - **PC-6**
+     - C0= ABD' + AC'D'F + AB'EF + AB'DE + AB'CF'
+  6. M9
+     - OPCODE(ABCD)
+     - CZ FLAG(EF)
+     - C0
+     - 1  - **PC+2**
+     - 0  - **PC-6+IMM*2(RA+IMM*2)**
+     - C0= A + B.D + D.E + C.E.F + B.CRA.PC-6
 ## Decode
   1. **PR2**
      1. 8-0 **Immediate** (from OPCODE)
@@ -157,7 +177,7 @@
      1. **T1 T0**
      -  0  0 -**R Type**
      -  1  0 -**I Type**
-     -  1  1 -**J Type**
+     -  1  1 -**J Type**`
      1. **OPCODE** (ABCD)
         1. T0=$A'C + CD + ABD'$
            >T0=+$A'C + CD + ABD'$
