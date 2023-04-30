@@ -167,6 +167,19 @@
        - 1  - **RB**
        - 0  - **o/w**
        - C0= ABC'D
+  17. Source Decoder 1
+      - OPCODE(ABCD)
+       - C0
+       - 0 - RA
+       - 1 - RB
+       - C0 =A'C' + A'B'
+  18. Source Decoder 2
+      - OPCODE(ABCD)
+       - C0
+       - 0 - RB
+       - 1 - RC
+       - C0 =A'
+  
 ## Decode
   1. **PR2**
      1. 8-0 **Immediate** (from OPCODE)
@@ -177,7 +190,17 @@
      6. 19 **MEM. WRite**
      7. 20 **Cary FLag Write**
      8. 21 **Zero FLag Write**
-     9. 23-22 **T1,t0**
+     9. 22 **Compliment bit**
+     10. 25-23 **ALU Control** C2-C1-C0
+     11. 26 **SE Control** 
+     12. 27 **M1 Control**
+     13. 28 **M2 Control**
+     14. 29 **M4 Control**
+     15. 30 **M5 Control**
+     16. 31 **M6 Control**
+     17. 32 **M14**
+     18. 36-33 **OPCODE**
+     19. 52-37 **PC Next**
   2. **OPCODE Decoder**
      1. **T1 T0**
      -  0  0 -**R Type**
@@ -638,7 +661,7 @@
   - $\text{PC}+2 \rightarrow \text{PR}_2(\text{PC})$
 - **Register read** 
      - $\text{PR}_2(\text{PC}) \rightarrow \text{PR}_3(\text{PC})$
-     - $\text{Constant}(\text{00}) \rightarrow \text{M}_2$
+     - $\text{Constant}(\text{00}) \rightarrow \text{M}_4$
      > Rb is sent through D2 
      - $\text{D}_2 \rightarrow \text{M}_2$
 
