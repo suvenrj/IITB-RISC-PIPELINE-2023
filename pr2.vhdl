@@ -11,11 +11,18 @@ end entity;
 
 architecture behave of Decoder is 
 
-signal A,B,C,D,Co,Cy,Z,A1,B1,C1,D1,Co1,Cy1,Z1: std_logic;  -- sign_ext control
+signal reg_sig : std_logic_vector(55 downto 0);  -- sign_ext control
 
     
 begin 
-	pr2_out(39 downto 0) <= decoder_out(15 downto 0);
-	pr2_out(55 downto 40) <= pc_next(15 downto 0);
-    	 
+	process (clk)
+    begin
+        if rising_edge(clk) then
+            if enable = '1' then
+                reg_sig(39 downto 0) <= decoder_out;
+				reg_sig(55 downto 40) <= pc_next;
+            end if;
+        end if;
+    end process;
+    pr2_out <= reg_sig;	 
 end behave;
