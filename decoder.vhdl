@@ -6,7 +6,34 @@ entity Decoder is
          D_out: out std_logic_vector(39 downto 0)); 
 end entity;
 
+entity mux2x1 is
+	port(I1: in std_logic_vector(2 downto 0);
+	     I2: in std_logic_vector(2 downto 0);
+		 S0: in std_logic;
+		I_out:out std_logic_vector(2 downto 0));
+end entity;
+
+architecture behavioral of mux2x1 is
+	begin
+		process (S0, I1, I2)
+		begin
+			if S0 = '0' then
+				I_out <= I1;
+			else
+				I_out <= I2;
+			end if;
+		end process;
+end architecture;
+
 architecture behave of Decoder is 
+
+component mux2x1 is
+	port(I1: in std_logic_vector(2 downto 0);
+	     I2: in std_logic_vector(2 downto 0);
+		 S0: in std_logic;
+		I_out:out std_logic_vector(2 downto 0));
+end component;
+	
 
 signal A,B,C,D,Co,Cy,Z,A1,B1,C1,D1,Co1,Cy1,Z1: std_logic;  -- sign_ext control
 
@@ -31,6 +58,7 @@ begin
    D_out(8 downto 0) <= pr1(8 downto 0);			--Storing same IMM
 	D_out(39 downto 36) <= pr1(15 downto 12);		--Storing OPCODE
 	D_out(11 downto 9) <= pr1(11 downto 9);			--Stroing Destination address
+	--D_out()<= pr1()
 	D_out(18) <= (A1 and  B1) or (A1 and  D1) or (A and  C1 and B) ; --Register File write enable
 	D_out(19) <= (A1 and  B and D)  ; 				--Data Memory write enable
 	D_out(20) <= (A1 and B1 and C1); 				-- C flag Write enable
@@ -49,8 +77,20 @@ begin
 	D_out(33) <= B; 						--M5-C1
 	D_out(34) <= (A and B1) or (B1 and C1 and D and Co) or (B1 and C and D1 and Co); 			--M6
 	D_out(35) <= A and B and C1 and D;		--M14
-
-
+	m1: mux2x1 
+	port map(
+		pr1(11 downto 9),
+		pr1(8 downto 6),
+		A1 and (C1 or B1),
+		D_out(14 downto 12)
+	);
+	m2: mux2x1 
+	port map(
+		pr1(8 downto 6),
+		pr1(5 downto 3),
+		A1 ,
+		D_out(17 downto 15)
+	);
 
 
 
