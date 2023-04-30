@@ -40,8 +40,8 @@ begin
             I_out <= I01;
 		elsif (S1 = '1' and S0 = '0') then
 			I_out <= I10;
-		else (S1 = '1' and S0 = '1') then
-            I_out <= I00;
+		else  
+			I_out <= I11;
         end if;
     end process;
 end Behavioral;

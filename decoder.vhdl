@@ -18,6 +18,15 @@ component mux2x1 is
 		 S0: in std_logic;
 		I_out:out std_logic_vector(2 downto 0));
 end component;
+
+component mux4x1 is
+    Port ( I00 : in  STD_LOGIC_VECTOR (2 downto 0);
+			I01 : in  STD_LOGIC_VECTOR (2 downto 0);
+			I10: in  STD_LOGIC_VECTOR (2 downto 0);
+			I11:in  STD_LOGIC_VECTOR (2 downto 0);
+		   S0, S1 : in std_logic;
+           I_out : out  STD_LOGIC_VECTOR(2 downto 0));
+end component;
 	
 
 signal A,B,C,D,Co,Cy,Z,A1,B1,C1,D1,Cy1,Z1,zero: std_logic;  -- sign_ext control
@@ -49,7 +58,7 @@ begin
 	D_out(19) <= (A1 and  B and D)  ; 				--Data Memory write enable
 	D_out(20) <= (A1 and B1 and C1); 				-- C flag Write enable
 	D_out(21) <= (A1 and B1 and C1) or (A1 and B1 and D1) or (A1 and C1 and D1);		-- Z flag enable
-	D_out(22) <= pr1(2);								-- Compliment bit
+	D_out(22) <= pr1(2);								-- Compliment bit	*Not used further yet*
 	D_out(23) <= (A and B1);							-- ALU(C0)
 	D_out(24) <= not(A or B) and (not(C or D1)) and (Cy and Z);						-- ALU(C1)
 	D_out(25) <= not(A or B) and (C and D1);			--ALU(C2)
@@ -57,7 +66,7 @@ begin
 	D_out(27) <=  Z;				--M1_C0
 	D_out(28) <= (B1) and (A1) and (C or D) and (Cy or Z) and (Cy1 or Z1) and (C1 or D1);		-- M1_C1
 	D_out(29) <= ((A1 and B) or (C and D) or (A1 and C1 and D1));									-- M2
-	D_out(30) <= A1 and Cy;				--M4-C0
+	D_out(30) <= A1 and pr1(8);				--M4-C0
 	D_out(31) <= (D1) or (A1 and C1) or (A and B1) or (B and C);				--M4-C1
 	D_out(32) <= A;						-- M5-C0
 	D_out(33) <= B; 						--M5-C1
@@ -70,11 +79,14 @@ begin
 		A1 and (C1 or B1),
 		D_out(14 downto 12)
 	);
-	m2: mux2x1 
+	m2: mux4x1 
 	port map(
 		pr1(8 downto 6),
 		pr1(5 downto 3),
-		A1 ,
+		pr1(11 downto 9),
+		pr1(11 downto 9),
+		A1,
+		A1 and B and C1 and D,
 		D_out(17 downto 15)
 	);
 
