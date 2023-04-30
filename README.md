@@ -132,7 +132,15 @@
       - 0 -**SE-6**
       - 1 -**SE-9**
       - C=A'C + AB
-   
+  12. ALU
+      - Opcode(ABCD)
+      - CZ bits(EF)
+      - C2-**ADD/Nand**
+      - C1-**W/Wo Carry**
+      - C0-**For SUbtraction**
+      - C2-0(ADD),1(NAND)=A'B'CD'
+      - C1-A'B'C'DEF
+      - C0-AB'
 
 ## Decode
   1. **PR2**
