@@ -26,23 +26,22 @@ entity mux4x1 is
 			I01 : in  STD_LOGIC_VECTOR (2 downto 0);
 			I10: in  STD_LOGIC_VECTOR (2 downto 0);
 			I11:in  STD_LOGIC_VECTOR (2 downto 0);
-           S : in  STD_LOGIC_VECTOR (1 downto 0);
+		   S0, S1 : in std_logic;
            I_out : out  STD_LOGIC_VECTOR(2 downto 0));
 end mux4x1;
 
 architecture Behavioral of mux4x1 is
 begin
-    process (I00,I01,I10,I11, S)
+    process (I00,I01,I10,I11, S0,S1)
     begin
-        case S is
-            when "00" =>
+        if (S1 = '0' and S0 = '0') then
                 I_out <= I00;
-            when "01" =>
-			I_out <= I01;
-            when "10" =>
+		elsif (S1 = '0' and S0 = '1') then
+            I_out <= I01;
+		elsif (S1 = '1' and S0 = '0') then
 			I_out <= I10;
-            when others =>
-                I_out <= I00;
-        end case;
+		else (S1 = '1' and S0 = '1') then
+            I_out <= I00;
+        end if;
     end process;
 end Behavioral;
