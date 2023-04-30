@@ -86,7 +86,6 @@
      - 0  0 - Cosnt(00)
      - 0  1 - Cosnt(01)
      - 1  0 - D1
-     - 1  1 - D2
      - C1=D' + A'C' + AB' + BC
      - C0=A'E
   5. M5
@@ -141,27 +140,33 @@
       - C2-0(ADD),1(NAND)=A'B'CD'
       - C1-A'B'C'DEF
       - C0-AB'
-  6. M7
-     - OPCODE(ABCD)
-     - CZ FLAG(EF)
-     - C0
-     - 0  - **+2**
-     - 1  - **-6**
-     - C0= ABD' + AC'D'F + AB'EF + AB'DE + AB'CF'
-  6. M8
-     - OPCODE(ABCD)
-     - CZ FLAG(EF)
-     - C0
-     - 0  - **RA**
-     - 1  - **PC-6**
-     - C0= ABD' + AC'D'F + AB'EF + AB'DE + AB'CF'
-  6. M9
-     - OPCODE(ABCD)
-     - CZ FLAG(EF)
-     - C0
-     - 1  - **PC+2**
-     - 0  - **PC-6+IMM*2(RA+IMM*2)**
-     - C0= A' + B.D + D.E' + C.E'.F + B'.C'.D'.F'
+  13. M7
+         - OPCODE(ABCD)
+         - CZ FLAG(EF)
+         - C0
+         - 0  - **+2**
+         - 1  - **-6**
+         - C0= ABD' + AC'D'F + AB'EF + AB'DE + AB'CF'
+  14. M8
+        - OPCODE(ABCD)
+         - CZ FLAG(EF)
+         - C0
+         - 0  - **RA**
+         - 1  - **PC-6**
+         - C0= ABD' + AC'D'F + AB'EF + AB'DE + AB'CF'
+  15. M9
+         - OPCODE(ABCD)
+         - CZ FLAG(EF)
+         - C0
+         - 1  - **PC+2**
+         - 0  - **PC-6+IMM*2(RA+IMM*2)**
+         - C0= A' + B'DE' + B'CD + B'C'D'F' + B'CE'F
+  16.  M14
+       - OPCODE(ABCD)
+       - C0
+       - 1  - **RB**
+       - 0  - **o/w**
+       - C0= ABC'D
 ## Decode
   1. **PR2**
      1. 8-0 **Immediate** (from OPCODE)
@@ -619,18 +624,14 @@
    - **Execute**
      - $\text{PR}_3(\text{PC}) \rightarrow \text{PR}_4(\text{PC})$
    >ALU 1 is of no use  
-     
-     
-  > SUBB Operation is Performed in ALU. If output is zero then it means branch is executed.
 
-  > Chech for Equality and turn on Appropriate MUXes
    - **Memory Access**
       - $\text{PR}_4(\text{PC}) \rightarrow \text{M}_5$
    - **Write back**
      - $\text{PR}_5 (\text{RA}) \rightarrow \text{A}_3$
      - $\text{PR}_5 (\text{PC}) \rightarrow \text{D}_3$ 
 
-25.    ### **JLR**
+25.  ### **JLR**
   **Turn off ALL** Write Signals(RF,Memory,CZ FLAGS).
   Stall the system onece **JRI** is decoded till it reaches **Mem Acc.** 
 - **Instruction Decode**
@@ -638,6 +639,7 @@
 - **Register read** 
      - $\text{PR}_2(\text{PC}) \rightarrow \text{PR}_3(\text{PC})$
      - $\text{Constant}(\text{00}) \rightarrow \text{M}_2$
+     > Rb is sent through D2 
      - $\text{D}_2 \rightarrow \text{M}_2$
 
  - **Execute**
