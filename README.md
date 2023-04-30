@@ -161,7 +161,7 @@
      - C0
      - 1  - **PC+2**
      - 0  - **PC-6+IMM*2(RA+IMM*2)**
-     - C0= A + B.D + D.E + C.E.F + B.CRA.PC-6
+     - C0= A' + B.D + D.E' + C.E'.F + B'.C'.D'.F'
 ## Decode
   1. **PR2**
      1. 8-0 **Immediate** (from OPCODE)
