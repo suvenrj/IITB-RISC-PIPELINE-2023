@@ -248,17 +248,15 @@
      5. 51 **RF Write** 
      6. 52 **MEM. WRite**
      7. 53 **Cary FLag Write**
-     8. 54 **Zero FLag Write**
-     
+     8. 54 **Zero FLag Write**    
      9.  57-55 **ALU Control** C2-C1-C0
-     
      10. 59-58 **M1 Control**
-     11. 51-50 **M5 Control**
-     12. 52 **M6 Control**
-     13. 53 **M14**
-     14. 57-54 **OPCODE**
-     15. 73-58 **PC Next**
-     16. 89-74 **D2**(For Mem. Store SW instr.)(has value of **RA**)
+     11. 61-60 **M5 Control**
+     12. 62 **M6 Control**
+     13. 63 **M14**
+     14. 67-64 **OPCODE**
+     15. 83-68 **PC Next**
+     16. 99-84 **D2**(For Mem. Store SW instr.)(has value of **RA**)
 ## Memory Access
 1. **PR4**
    1. 15-0 **ALU-C** (from ALU1 output)
