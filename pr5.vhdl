@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 entity pr5 is
     port(clk: in std_logic;
         data_in : in std_logic_vector(15 downto 0); 
-        --pc_next: in std_logic_vector(15 downto 0);				-- if Instruction at PC is at ID stage then PC_next is PC+2
+        
 		rf_write_en : in std_logic;
         dest_reg: in std_logic_vector(2 downto 0);	
         
