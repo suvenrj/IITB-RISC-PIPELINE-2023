@@ -19,7 +19,7 @@ signal carry_over , Out_sig: std_logic_vector(15 downto 0);
 
 
 begin
-    process(A,B,C2,Cy)
+    process(A,B,C2,Cy,carry_over,Out_sig)
     begin
         if (C2='0') then
 
