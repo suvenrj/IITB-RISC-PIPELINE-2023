@@ -45,3 +45,25 @@ begin
         end if;
     end process;
 end Behavioral;
+
+library ieee;
+use ieee.std_logic_1164.all;
+entity mux2x1_1bit is
+	port(I0: in std_logic;
+	     I1: in std_logic;
+		 S0: in std_logic;
+		I_out:out std_logic);
+end entity;
+
+architecture behavior of mux2x1_1bit is
+	begin
+		process (S0, I0, I1)
+		begin
+			if S0 = '0' then
+				I_out <= I0;
+			else
+				I_out <= I1;
+			end if;
+		end process;
+end architecture;
+

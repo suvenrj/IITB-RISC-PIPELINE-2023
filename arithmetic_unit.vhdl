@@ -36,7 +36,10 @@ signal carry_over , Out_sig: std_logic_vector(15 downto 0):=(others => '0');
 begin
     process(A,B,C2,Cy,carry_over,Out_sig)
     begin
-        case C2 is
+        new_cy<='0';
+		  carry_over <=(others => '0');
+		  Out_sig<=(others => '0');
+		  case C2 is
             
             when '1' =>
             loop2: for j in 1 to 15 loop
@@ -54,6 +57,13 @@ begin
             
             new_cy <= carry_over(15);
         end case;
+		  
+		  case Out_sig is
+				when (others=>'0') =>
+					new_zero <= '0';
+				when others =>
+					new_zero <= '1';
+			end case;
             
             
     end process;
