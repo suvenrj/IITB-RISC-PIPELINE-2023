@@ -6,9 +6,8 @@ entity exec is
     pr3: in std_logic_vector(99 downto 0);
     pr4_en: in std_logic;
     ex_out:out std_logic_vector(54 downto 0);
-    REGA_data,REGb_data: out std_logic_vector(15 downto 0); decoder2_out,dest_addr:out std_logic_vector(2 downto 0);
+    REGA_data: out std_logic_vector(15 downto 0); decoder2_out:out std_logic_vector(2 downto 0);
     se_out,ALU_C_out:out  std_logic_vector(15 downto 0);M14_Control:out std_logic;
-    ex_data: out std_logic_vector(15 downto 0);
     ex_dest: out std_logic_vector(2 downto 0));
 end entity exec;
 
@@ -112,15 +111,13 @@ architecture bhv_exec of exec is
         port map(pr3(67 downto 64),cy_frm_alu,z_frm_alu,M7_control,M8_control,M9_control);
 
         REGA_data<=pr3(31 downto 16);
-        REGB_data<=pr3(47 downto 32);
+        --REGB_data<=pr3(47 downto 32);
         decoder2_out(0)<=M7_control;
         decoder2_out(1)<=M8_control;
         decoder2_out(2)<=M9_control;
-        dest_addr<=pr3(50 downto 48);
         Se_out<=pr3(15 downto 0);
         ALU_c_out<=ALU_out;
         M14_control<= pr3(63);
-        ex_data<=alu_out;
         ex_dest<=pr3(50 downto 48);
 
         ex_out <=pr4_outt;
