@@ -6,10 +6,10 @@ entity pc_register is
 end entity;
 
 architecture behave of pc_register is 
-    signal pc_val;
+    signal pc_val:  std_logic_vector(15 downto 0);
     begin 
         pc_out <= pc_val;
-        proc: process(clock, pc_in, pc_write_en)
+        proc: process(clock, pc_in, pc_write_en,pc_val)
             begin 
                 if (rising_edge(clock)) then
                     if (pc_write_en='1') then

@@ -2,17 +2,17 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity instruction_fetch is 
-    port (clock: in std_logic; instruction_out : out std_logic_vector(15 downto 0); opcode_exec: in std_logic_vector(3 downto 0); 
-    reg_a_data: in std_logic_vector(15 downto 0); reg_b_data: in std_logic_vector(15 downto 0);imm_exec: in std_logic_vector(15 downto 0); branch_taken: in std_logic
+    port (clk: in std_logic; instruction_out : out std_logic_vector(15 downto 0);  
+    reg_a_data: in std_logic_vector(15 downto 0); reg_b_data: in std_logic_vector(15 downto 0);imm_exec: in std_logic_vector(15 downto 0);
+	 m7_cont,m8_cont,m9_cont,m14_cont: in std_logic; pr1_en : in std_logic;pc_en :in std_logic -- from data hazard
     );
 end entity;
 
 architecture behave of instruction_fetch is 
-    signal s1, s2, s3, s4, s5, s6, s7: std_logic_vector(15 downto 0);
-	 -- needs to be changed
-    
+    signal c_6,c_2,s1,s2,s3,s4,s5,s6,s7,s8: std_logic_vector(15 downto 0);
+
     component pc_register is
-        port (pc_in: in std_logic_vector(15 downto 0); pc_out : out std_logic_vector(15 downto 0); clock: in std_logic);
+        port (pc_in: in std_logic_vector(15 downto 0); pc_out : out std_logic_vector(15 downto 0); clock: in std_logic; pc_write_en: in std_logic);
     end component;
     
     component alu_pc_2 is 
@@ -24,42 +24,38 @@ architecture behave of instruction_fetch is
           dataPointer   : in std_logic_vector(15 downto 0);      
           do  : out std_logic_vector(15 downto 0));  
     end component; 
+	component mux2x1_16bit is
+        port(I0: in std_logic_vector(15 downto 0);
+             I1: in std_logic_vector(15 downto 0);
+             S0: in std_logic;
+            I_out:out std_logic_vector(15 downto 0));
+    end component;
+    component pr1 is
+        port(Instr : in std_logic_vector(15 downto 0); 
+                pr1_wr_en: in std_logic;
+                clk: in std_logic;
+                pr1_out: out std_logic_vector(15 downto 0)); 
     
+    end component;
     begin 
-    
-    PC : pc_register port map(s6, s1, clock);
-    PC_ALU : alu_pc_2 port map (s1, s2);
-    PC_IMM_ALU: alu_pc_2 port map (s4, s7);
-    INSTRUCTION_MEM : rom port map (s1, instruction_out);
-
-    s7 <= imm_exec<<2;
-
-    proc_mux_7: process(opcode_exec, branch_taken)
-    begin
-        if ((opcode_exec="1000" or opcode_exec="1001" or opcode_exec="1010" or opcode_exec = "1100") and branch_taken='1') then
-            s2 <= "0000000000000110";
-        else
-            s2 <= "0000000000000010";
-        end if;
-    end process;
-    proc_mux_12: process(opcode_exec, branch_taken, s3, reg_a_data)
-    begin
-        if (((opcode_exec="1000" or opcode_exec="1001" or opcode_exec="1010") and branch_taken='1')  or opcode_exec = "1100") then
-            s4 <= s3;
-        elsif (opcode_exec = "1111")
-            s4 <= reg_a_data;
-        else
-            s4<='0';
-        end if;
-    end process;
-    proc_mux_6: process(opcode_exec, branch_taken, s3, s5, reg_b_data)
-    begin
-        if (opcode_exec = "1101") then
-            s6 <= reg_b_data;
-        elsif (((opcode_exec="1000" or opcode_exec="1001" or opcode_exec="1010") and branch_taken='1')  or opcode_exec = "1100" or opcode_exec = "1111") then
-            s6 <= s5;
-        else
-            s6<= s3;
-        end if;
-    end process;
+    c_6 <= "0000000011111010";
+    c_2 <= "0000000000000001";
+    m7 : mux2x1_16bit
+        port map(c_2,c_6,m7_cont,s2);
+    adder1 : alu_pc_2
+        port map(s1,s2,s3);
+    m8 : mux2x1_16bit
+        port map(reg_a_data,s3,m8_cont,s4);
+    adder2 : alu_pc_2
+        port map(s4,imm_exec,s5);
+    m9 : mux2x1_16bit
+        port map(s5,s3,m9_cont,s6);
+    m14 : mux2x1_16bit
+        port map(s6,reg_b_data,m14_cont,s7);
+    PC : pc_register 
+        port map(s7, s1, clk,pc_en);
+    Inst_mem : rom
+        port map(s1,s8);
+    pr1_reg : pr1
+        port map(s8,pr1_en,clk,instruction_out);
 end behave;

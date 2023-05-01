@@ -11,25 +11,17 @@ entity rom is
 end entity; 
 
 architecture membehave of rom is 
-	type RAM is array(0 to ((65536)-1)) of std_logic_vector(15 downto 0);
-	signal storage: RAM;
+	type RAM is array(0 to ((65536)-1)) of std_logic_vector(15 downto 0) ;
+	signal storage: RAM := (others=>(others=>'0')) ;
 	begin
-	process(dataPointer)
-		begin 
-			--report "dataPointer:"&integer'image(to_integer(unsigned(dataPointer)));
-			-- if (init = '1') then
-			-- 	storage(0) <= "0011000000000100"; -- LHI R0, 000000100
-			-- 	storage(1) <= "0011001000000010"; -- LHI R1, 000000010
-			-- 	storage(2) <= "0001000001010000"; -- ADD R2 <- R1+R0
-			-- 	storage(3) <= "0000000001000001"; -- ADDI R1 <- 000001+R0
-			-- 	storage(4) <= "0111010001000001"; -- SW R2 -> M[R1+000001] 
-			-- 	storage(5) <= "0101011001000001"; -- LW R3 <- M[R1+000001]
-			-- 	storage(6) <= "1000010011000100"; -- BEQ R2,R3 to PC+000100;				
-			-- 	storage(10) <= "1001100000000010"; -- JAL R4, 0...000010;
-			-- 	storage(12) <= "0010000001010000"; -- NND R2 <- R1 nand R0
-			-- 	storage(13) <= "0100000001010000"; -- OC_TER
-            --     --change initialization values
-			-- end if;
+	process(dataPointer,storage)
+		begin 	-- three arbitary instruction at three locations
+					storage(1) <= "0011000000001100"; 
+					storage(2) <= "0100010000000000"; 
+					storage(5) <= "1111101111110001";
+					
+					-- if warning comes 'Warning : Pin "instruction_out[x]" is stuck at GND' then it means that ,for all y, storage(y)(x) is '0'. Similarly for VCC for '1'.
+					-- Actually this happens if instruction are set in that manner, but computer doesnt understand its intentional and not logical error.
             do <= storage(to_integer(unsigned(dataPointer)));
 	end process; 
 	end membehave;
