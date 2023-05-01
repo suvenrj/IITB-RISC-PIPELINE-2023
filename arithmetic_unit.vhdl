@@ -15,7 +15,7 @@ end entity;
 
 architecture bhv of arithmetic_unit is
 
-signal carry_over , Out_sig: std_logic_vector(15 downto 0);
+signal carry_over , Out_sig: std_logic_vector(15 downto 0):=(others => '0');
 
 
 begin
@@ -40,6 +40,11 @@ begin
                 
             end loop loop2;
         end if;
+
+        
+    end process;
+    process(Out_sig)
+    begin
         if Out_sig ="0000000000000000" then
             new_zero <= '1';
         else 
