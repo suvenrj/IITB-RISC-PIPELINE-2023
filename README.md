@@ -24,12 +24,11 @@
 
 - PR: **Pipeline registers** 
   - 5 no of PR
-    - **Instruction Fetch (IF)**
-    - **Instruction Decode (ID)**
-    - **Register Read (RR)**
-    - **Execute (EX)**
-    - **Memory Access (MAcc)**
-    - **Write Back (WB)**
+    - **Instruction Fetch (IF)(16 bits)**
+    - **Instruction Decode (ID)(56 bits)**
+    - **Register Read (RR)(90 bits)**
+    - **Execute (EX)(36 bits)**
+    - **Memory Access (MAcc)(20 bits)**
 - **16-bit** System All `egisters`, `Accumilator`, and `ALU` are of 16 bits.
 
 ## Pipelining Stages
@@ -193,14 +192,14 @@
      9. 22 **Compliment bit**
      10. 25-23 **ALU Control** C2-C1-C0
      11. 26 **SE Control** 
-     12. 27 **M1 Control**
-     13. 28 **M2 Control**
-     14. 29 **M4 Control**
-     15. 30 **M5 Control**
-     16. 31 **M6 Control**
-     17. 32 **M14**
-     18. 36-33 **OPCODE**
-     19. 52-37 **PC Next**
+     12. 28-27 **M1 Control**
+     13. 29 **M2 Control**
+     14. 31-30 **M4 Control**
+     15. 33-32 **M5 Control**
+     16. 34 **M6 Control**
+     17. 35 **M14**
+     18. 39-36 **OPCODE**
+     19. 55-40 **PC Next**
   2. **OPCODE Decoder**
      1. **T1 T0**
      -  0  0 -**R Type**
@@ -211,6 +210,28 @@
            >T0=+$A'C + CD + ABD'$
         2. T1=$B + A + C'D' + CD$
            >T1=$B + A + C'D' + CD$
+  3. **Decoder 2**
+     1. M7
+         - OPCODE(ABCD)
+         - CZ FLAG(EF)
+         - C0
+         - 0  - **+2**
+         - 1  - **-6**
+         - C0= ABD' + AC'D'F + AB'EF + AB'DE + AB'CF'
+     2. M8
+        - OPCODE(ABCD)
+         - CZ FLAG(EF)
+         - C0
+         - 0  - **RA**
+         - 1  - **PC-6**
+         - C0= ABD' + AC'D'F + AB'EF + AB'DE + AB'CF'
+      3. M9
+         - OPCODE(ABCD)
+         - CZ FLAG(EF)
+         - C0
+         - 1  - **PC+2**
+         - 0  - **PC-6+IMM*2(RA+IMM*2)**
+         - C0= A' + B'DE' + B'CD + B'C'D'F' + B'CE'F
 
 
 ## Execute
@@ -219,6 +240,41 @@
      2. $\text{ADD Compliment}(A+\bar{B})$
      3. $\text{NAND}(\bar{A}+\bar{B})$
      4. $\text{SUBB}(A-B)$
+  2. **PR3**
+     1. 15-0 **Immediate** (from SE-OUT)
+     2. 31-16 **Source1 DATA** for ALU1A 
+     3. 47-32 **Source2 DATA** for ALU1B
+     4. 50-48 **Destination** Address(from Instruction)
+     5. 51 **RF Write** 
+     6. 52 **MEM. WRite**
+     7. 53 **Cary FLag Write**
+     8. 54 **Zero FLag Write**
+     
+     9.  57-55 **ALU Control** C2-C1-C0
+     
+     10. 59-58 **M1 Control**
+     11. 51-50 **M5 Control**
+     12. 52 **M6 Control**
+     13. 53 **M14**
+     14. 57-54 **OPCODE**
+     15. 73-58 **PC Next**
+     16. 89-74 **D2**(For Mem. Store SW instr.)(has value of **RA**)
+## Memory Access
+1. **PR4**
+  1. 15-0 **ALU-C** (from ALU1 output)
+  2. 18-16 **Destination** Address(from Instruction)
+  3. 17 **RF Write** 
+  4. 18 **MEM. WRite**
+  5.  20-19 **M5 Control**
+  6.  35-20 **PC Next**
+  7.  51-36 **D2**(For Mem. Store SW instr.)(has value of **RA**)
+  > JLR instruction RB+0 =RB is calculated in ALU and sent through M-14 in this stage so control signal for M14 is no loger needed in PR-4.
+## Write Back
+1.**PR5**
+  1. 15-0 **Write Back Data** (from M5 could be ALU-C or Mem_Data PC_next)
+  2. 18-16 **Destination** Address(from Instruction)
+  3. 17 **RF Write** 
+
 
 ##  Instructions
 - ### Common stage for Instruction fetch
