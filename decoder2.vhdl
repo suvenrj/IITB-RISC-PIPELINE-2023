@@ -26,7 +26,7 @@ begin
 	E1 <= not C_alu;
     F1 <= not z_alu;
 	
-	M7_control <= (A and B and D1) or (A and C1 and D1 and F) or (A and B1 and E and F) or (A and B1 and D and E) or (A and B1 and C and F1 );
-	M8_control <= (A and B and D1) or (A and C1 and D1 and F) or (A and B1 and E and F) or (A and B1 and D and E) or (A and B1 and C and F1 );
-    M9_control <= (A1) or (B1 and D and E1) or (B1 and C and D) or (B1 and C1 and D1 and F1) or (B1 and C and E1 and F);
+	M7_control <= (A and B and D1 ) or (A and B1 and (E or F));
+	M8_control <= (A and B and D1 ) or (A and B1 and (E or F));
+    M9_control <= not((A and B and ((C and D)or(C1 and D1))) or(A and B and  (E or F)));
 end architecture;
