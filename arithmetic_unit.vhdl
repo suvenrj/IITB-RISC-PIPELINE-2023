@@ -60,9 +60,9 @@ begin
 		  
 		  case Out_sig is
 				when (others=>'0') =>
-					new_zero <= '0';
-				when others =>
 					new_zero <= '1';
+				when others =>
+					new_zero <= '0';
 			end case;
             
             
