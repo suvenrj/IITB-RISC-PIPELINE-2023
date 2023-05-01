@@ -257,6 +257,15 @@
      14. 67-64 **OPCODE**
      15. 83-68 **PC Next**
      16. 99-84 **D2**(For Mem. Store SW instr.)(has value of **RA**)
+  3. **Outpus**
+     1. pr4 outputs(54 downto 0)
+     2. RegA data (0 downto 15)
+     3. REg B data (0 downto 15)
+     4. SE_OUT(0 downto 15)
+     5. Decoder 2 out (0 downto 2)
+     6. M14 control bit 
+     7. ALU out (16 bits for data forward)
+     8. Destination address from PR3(3 bits for data forwarding)
 ## Memory Access
 1. **PR4**
    1. 15-0 **ALU-C** (from ALU1 output)
@@ -271,7 +280,7 @@
 1.**PR5**
   1. 15-0 **Write Back Data** (from M5 could be ALU-C or Mem_Data PC_next)
   2. 18-16 **Destination** Address(from Instruction)
-  3. 17 **RF Write** 
+  3. 19 **RF Write** 
 
 
 ##  Instructions

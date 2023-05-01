@@ -2,7 +2,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity exec is
-	port(clk: in std_logic;pr3: in std_logic_vector(99 downto 0);pr4_en: in std_logic;ex_out:out std_logic_vector(54 downto 0));
+	port(clk: in std_logic;
+    pr3: in std_logic_vector(99 downto 0);
+    pr4_en: in std_logic;
+    ex_out:out std_logic_vector(54 downto 0);
+    REGA_data,REGb_data: out std_logic_vector(15 downto 0); decoder2_out,dest_addr:out std_logic_vector(2 downto 0);
+    se_out,ALU_C_out:out  std_logic_vector(15 downto 0);M14_Control:out std_logic);
 end entity exec;
 
 -- data 1 and data 2 are for ALU but data_imm is needed for beq instr
@@ -70,7 +75,13 @@ architecture bhv_exec of exec is
                 pr4_out: out std_logic_vector(54 downto 0)); 
     end component;
 
-    signal cy_frm_alu,cy_old,z_frm_alu,z_old,m1_out:std_logic;
+    component Decoder2 is
+        port(OPCODE : in std_logic_vector(3 downto 0); 
+             C_alu,Z_alu: in std_logic;
+             M7_control,M8_control,M9_control: out std_logic);          
+    end component;
+
+    signal cy_frm_alu,cy_old,z_frm_alu,z_old,m1_out,M7_control,M8_control,M9_control:std_logic;
     signal comp_out,m6_out,alu_out:std_logic_vector(15 downto 0);
     signal pr4_outt: std_logic_vector(54 downto 0);
     begin
@@ -95,8 +106,22 @@ architecture bhv_exec of exec is
         pr4_reg: pr4
         port map(ALU_out,m1_out,pr4_en,pr3(50 downto 48),pr3(52),pr3(61 downto 60),pr3(83 downto 68),pr3(99 downto 84),clk,pr4_outt);
 
+        Dec_2: Decoder2
+        port map(pr3(67 downto 64),cy_frm_alu,z_frm_alu,M7_control,M8_control,M9_control);
+
+        REGA_data<=pr3(31 downto 16);
+        REGB_data<=pr3(47 downto 32);
+        decoder2_out(0)<=M7_control;
+        decoder2_out(1)<=M8_control;
+        decoder2_out(2)<=M9_control;
+        dest_addr<=pr3(50 downto 48);
+        Se_out<=pr3(15 downto 0);
+        ALU_c_out<=ALU_out;
+        M14_control<= pr3(63);
+
+
         ex_out <=pr4_outt;
+
 		
 
 end bhv_exec;
-    
