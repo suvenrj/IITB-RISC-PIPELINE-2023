@@ -30,6 +30,21 @@
     - **Execute (EX)(36 bits)**
     - **Memory Access (MAcc)(20 bits)**
 - **16-bit** System All `egisters`, `Accumilator`, and `ALU` are of 16 bits.
+## hazard
+1. Load Hazard(stop for 1 cycle)
+   1. check both sources
+      - ADD
+      - NAND
+      - BEQ
+      - BLT
+      - BLE
+   2. chech only rb
+      - JLR
+      - LW
+      - SW
+   3. check on ra
+      - JRI
+2. x` 
 
 ## Pipelining Stages
 
