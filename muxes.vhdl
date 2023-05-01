@@ -111,3 +111,27 @@ architecture behavioral of mux2x1_16bit is
 			end if;
 		end process;
 end architecture;
+
+library ieee;
+use ieee.std_logic_1164.all;
+entity mux4x1_16 is
+	port(I00,I01,I10,I11: in std_logic_vector(15 downto 0);
+		 S0: in std_logic_vector(1 downto 0);
+		I_out:out std_logic_vector(15 downto 0));
+end entity;
+
+architecture behavioral_4x1_16 of mux4x1_16 is
+	begin
+		process (S0, I00, I01,I10,I11)
+		begin
+			if S0 = "00" then
+				I_out <= I00;
+			elsif s0 = "01" then
+				I_out <= I01;
+			elsif s0 = "10" then
+				I_out <= I10;
+			else
+				I_out <= I11;
+			end if;
+		end process;
+end architecture;
