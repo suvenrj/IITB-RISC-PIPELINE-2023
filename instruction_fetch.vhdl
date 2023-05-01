@@ -4,7 +4,9 @@ use ieee.std_logic_1164.all;
 entity instruction_fetch is 
     port (clk: in std_logic; instruction_out : out std_logic_vector(15 downto 0);  
     reg_a_data: in std_logic_vector(15 downto 0); reg_b_data: in std_logic_vector(15 downto 0);imm_exec: in std_logic_vector(15 downto 0);
-	 m7_cont,m8_cont,m9_cont,m14_cont: in std_logic; pr1_en : in std_logic;pc_en :in std_logic -- from data hazard
+	m7_cont,m8_cont,m9_cont,m14_cont: in std_logic; pr1_en : in std_logic;pc_en :in std_logic; -- from data hazard
+    pc_next:out std_logic_vector(15 downto 0)
+
     );
 end entity;
 
@@ -38,6 +40,7 @@ architecture behave of instruction_fetch is
     
     end component;
     begin 
+    pc_next<=s1;
     c_6 <= "0000000011111010";
     c_2 <= "0000000000000001";
     m7 : mux2x1_16bit
