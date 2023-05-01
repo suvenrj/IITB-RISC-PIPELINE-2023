@@ -2,55 +2,31 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity operand_read is
-    port(opcode : in std_logic_vector(3 downto 0); 
-            adr1: in std_logic_vector(2 downto 0); 
-                adr2: in std_logic_vector(2 downto 0);
-                imm6_in: in std_logic_vector(5 downto 0);
-                imm9_in: in std_logic_vector(8 downto 0);
-                imm_out : out std_logic_vector(5 downto 0);
-                opr1: out std_logic_vector(15 downto 0);
-                opr2: out std_logic_vector(15 downto 0);
-                write_data: in std_logic_vector(15 downto 0);   -- some cross-over with write back stage
-                write_signal: in std_logic;
-                write_adr: in std_logic_vector(2 downto 0);
-                --stuff for data forwarding
-                adr1_exec: in std_logic_vector(2 downto 0);
-                data1_exec: in std_logic_vector(15 downto 0);
-                df1_exec : in std_logic;
-                adr2_exec: in std_logic_vector(2 downto 0);
-                data2_exec: in std_logic_vector(15 downto 0);
-                df2_exec: in std_logic;
-                adr1_ma: in std_logic_vector(2 downto 0);
-                data1_ma : in std_logic_vector(15 downto 0);
-                df1_ma: in std_logic;
-                adr2_ma: in std_logic_vector(2 downto 0);
-                data2_ma: in std_logic_vector(15 downto 0);
-                df2_ma: in std_logic;
-                adr1_wb: in std_logic_vector(2 downto 0);
-                data1_wb: in std_logic_vector(15 downto 0);
-                df1_wb: in std_logic;
-                adr2_wb: in  std_logic_vector(2 downto 0);
-                data2_wb: in std_logic_vector(15 downto 0));
-                df2_wb: in std_logic;
+    port(pr2_out: in std_logic_vector(55 downto 0);
+         dest_add: in std_logic_vector(2 downto 0);
+         dest_data: in std_logic_vector(15 downto 0);
+         rf_wr_en: in std_logic;
+         pr3_wr_en:in std_logic;
+         clk:in std_logic;
+
+         or_out:out std_logic_vector(99 downto 0));
 end entity;
 
-architecture behave of operand_read is 
+architecture behave_or of operand_read is 
 
 signal data_regfi1,data_regfi2,s3: std_logic_vector(15 downto 0);
 signal s1: std_logic_vector(5 downto 0);
 signal s2: std_logic_vector(8 downto 0);
 signal s4: std_logic;  -- sign_ext control
 
-component register_file is    
-  port(
-		--state : in std_logic_vector(3 downto 0);
-		dinm : in std_logic_vector(15 downto 0);  
-	  	regsela : in std_logic_vector(2 downto 0);
-		regselb	: in std_logic_vector(2 downto 0);
-		regselm : in std_logic_vector(2 downto 0);
-		regwrite : in std_logic;
-		douta : out std_logic_vector(15 downto 0);
-		doutb : out std_logic_vector(15 downto 0) );
+component regfi is
+    port (
+        clk : in std_logic;
+        reg_write : in std_logic;
+        add_reg_1, add_reg_2, add_write : in std_logic_vector(2 downto 0);
+        write_data : in std_logic_vector(15 downto 0);
+        data_1, data_2 : out std_logic_vector(15 downto 0)
+    );
 end component;
 
 component sign_ext is
@@ -62,55 +38,56 @@ component sign_ext is
 		se_out: out std_logic_vector(15 downto 0)) ;
 end component;
     
-begin 
+component mux2x1_16bit is
+	port(I0: in std_logic_vector(15 downto 0);
+	     I1: in std_logic_vector(15 downto 0);
+		 S0: in std_logic;
+		I_out:out std_logic_vector(15 downto 0));
+end component;
 
-    reg : register_file port map(write_data, adr1, adr2, write_adr, write_signal, data_regfi1, data_regfi2);
-    sign_extender : sign_ext port map(imm6_in, imm9_in, s4, s3);
-    imm_out <= s3;
-    proc_sign_control : process(opcode)
-    begin
-        if (opcode = "0011") then
-            s4<='1';
-        else
-            s4<='0';
-        end if;
-    end process;
-	proc1 : process(data_regfi1,data1_exec,data1_wb,data1_ma, data_regfi2, opcode)
-	 begin
-        if (adr1_exec = adr1 and df1_exec='1') then
-            opr1 <= data1_exec;
-        elsif (adr1_ma = adr1 and df1_ma='1') then
-            opr1 <= data1_ma;
-        elsif (adr1_wb = adr1 and df1_wb='1') then
-            opr1 <= data1_wb;
-        else
-            if (opcode = "0100" or opcode="0101") then
-                opr1 <= data_regfi2;
-            elsif (opcode = "0011") then
-                if (s3(0)='0') then 
-                    opr1<="0000001000000000";
-                else
-                    opr1 <="0000000000000000";
-                end if;
-            else
-                opr1 <= data_regfi1;
-            end if;
-        end if;
-	 end process;
-	proc2 : process(data_regfi2,data2_exec,data2_wb,data2_ma, s3, opcode)
-	begin
-        if (adr2_exec = adr2 and df2_exec='1') then
-            opr2 <= data2_exec;
-        elsif (adr2_ma = adr2 and df2_ma='1') then
-            opr2 <= data2_ma;
-        elsif (adr2_wb = adr2 and df2_wb='1') then
-            opr2 <= data2_wb;
-        else
-            if (opcode = "0100" or opcode="0101" or opcode = "0011") then
-                opr2 <= s3;
-            else
-                opr2 <= data_regfi2;
-            end if;
-        end if;    
-end process;	 
-end behave;
+component mux4x1_16 is
+	port(I00,I01,I10,I11: in std_logic_vector(15 downto 0);
+		 S0: in std_logic_vector(1 downto 0);
+		I_out:out std_logic_vector(15 downto 0));
+end component;
+
+component pr3 is
+    port(opr1 : in std_logic_vector(15 downto 0); --
+        opr2: in std_logic_vector(15 downto 0); --
+        imm : in std_logic_vector(15 downto 0); --
+        pc_next: in std_logic_vector(15 downto 0);	-- if Instruction at PC is at ID stage then PC_next is PC+2
+        reg_a_data_sw: in std_logic_vector(15 downto 0);	--
+        dest_reg: in std_logic_vector(2 downto 0); --
+        alu_control: in std_logic_vector(2 downto 0);  --
+        carry_write_en: in std_logic; --
+        zero_flag_en: in std_logic; --
+        m5_control: in std_logic_vector(1 downto 0); ---
+        m6_control: in std_logic; ---
+        m1_control: in std_logic_vector(1 downto 0); --
+        m14_control: in std_logic;
+        opcode: in std_logic_vector(3 downto 0);
+        regfi_write_en: in std_logic; --
+        data_memory_write_en: in std_logic; --
+        pr3_wr_en: in std_logic;
+        clk: in std_logic;
+
+        pr3_out: out std_logic_vector(99 downto 0)); 
+end component;
+
+signal D1,D2,imm_out,M2_out,M4_out: std_logic_vector(15 downto 0);
+begin 
+    reg_file:regfi
+    port map(clk,rf_wr_en,pr2_out(14 downto 12),pr2_out(17 downto 15),dest_add,dest_data,D1,D2);
+
+    si_ext: sign_ext
+    port map(pr2_out(5 downto 0),pr2_out(8 downto 0),pr2_out(26),IMM_out);
+
+    m4: mux4x1_16
+    port map("0000000000000000","0000001000000000",D1,D1,pr2_out(31 downto 30),M4_out);
+
+    m2: mux2x1_16bit
+    port map(D2,IMM_out,pr2_out(29),m2_out);
+
+    pr3_reg: pr3
+    port map(m4_out,m2_out,Imm_out,pr2_out(55 downto 40),D2,pr2_out(11 downto 9),pr2_out(25 downto 23),pr2_out(20),pr2_out(21),pr2_out(33 downto 32),pr2_out(34),pr2_out(28 downto 27),pr2_out(35),pr2_out(39 downto 36),pr2_out(18),pr2_out(19),pr3_wr_en,clk,or_out);
+end architecture;
