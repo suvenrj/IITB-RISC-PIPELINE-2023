@@ -261,13 +261,13 @@
      16. 89-74 **D2**(For Mem. Store SW instr.)(has value of **RA**)
 ## Memory Access
 1. **PR4**
-  1. 15-0 **ALU-C** (from ALU1 output)
-  2. 18-16 **Destination** Address(from Instruction)
-  3. 17 **RF Write** 
-  4. 18 **MEM. WRite**
-  5.  20-19 **M5 Control**
-  6.  35-20 **PC Next**
-  7.  51-36 **D2**(For Mem. Store SW instr.)(has value of **RA**)
+   1. 15-0 **ALU-C** (from ALU1 output)
+   2. 18-16 **Destination** Address(from Instruction)
+   3. 19 **RF Write** 
+   4. 20 **MEM. WRite**
+   5.  22-21 **M5 Control**
+   6.  38-23 **PC Next**
+   7.  54-39 **D2**(For Mem. Store SW instr.)(has value of **RA**)
   > JLR instruction RB+0 =RB is calculated in ALU and sent through M-14 in this stage so control signal for M14 is no loger needed in PR-4.
 ## Write Back
 1.**PR5**

@@ -2,12 +2,12 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 
-entity complementer is
+entity complimenter is
     Port ( Inp : in  std_logic_vector(15 downto 0);
            Outp : out std_logic_vector(15 downto 0));
-end complementer;
+end complimenter;
 
-architecture Behav_comp of complementer is
+architecture Behav_comp of complimenter is
 begin
 
     process(inp)

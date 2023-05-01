@@ -2,8 +2,11 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 -- Sign extender with two inputs, first for SE6, and other for SE9
--- control = pqr's 
--- se_out still has to sent to mux in order to update T1 register whenever required
+
+-- Control
+-- 0 -**SE-6**
+-- 1 -**SE-9**
+-- Control=A'C + AB
 
 entity sign_ext is
 	port (
@@ -47,7 +50,7 @@ begin
 		begin
 			if control = '0' then
 				se_out <= SE_6(input_6);
-			elsif control = '1' then
+			else 
 				se_out <= SE_9(input_9);
 			end if;
 	end process P1;
