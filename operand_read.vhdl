@@ -8,6 +8,8 @@ entity operand_read is
          rf_wr_en: in std_logic;
          pr3_wr_en:in std_logic;
          clk:in std_logic;
+         ex_data,macc_data: in std_logic_vector(15 downto 0);
+         ex_dest,macc_dest: in std_logic_vector(2 downto 0);
 
          or_out:out std_logic_vector(99 downto 0));
 end entity;
@@ -18,6 +20,8 @@ signal data_regfi1,data_regfi2,s3: std_logic_vector(15 downto 0);
 signal s1: std_logic_vector(5 downto 0);
 signal s2: std_logic_vector(8 downto 0);
 signal s4: std_logic;  -- sign_ext control
+signal m15_out,m16_out :std_logic_vector (15 downto 0 );
+signal op:std_logic_vector(3 downto 0);
 
 component regfi is
     port (
@@ -76,6 +80,7 @@ end component;
 
 signal D1,D2,imm_out,M2_out,M4_out: std_logic_vector(15 downto 0);
 begin 
+    op <= pr2_out(39 downto 36);
     reg_file:regfi
     port map(clk,rf_wr_en,pr2_out(14 downto 12),pr2_out(17 downto 15),dest_add,dest_data,D1,D2);
 
@@ -89,5 +94,40 @@ begin
     port map(D2,IMM_out,pr2_out(29),m2_out);
 
     pr3_reg: pr3
-    port map(m4_out,m2_out,Imm_out,pr2_out(55 downto 40),D2,pr2_out(11 downto 9),pr2_out(25 downto 23),pr2_out(20),pr2_out(21),pr2_out(33 downto 32),pr2_out(34),pr2_out(28 downto 27),pr2_out(35),pr2_out(39 downto 36),pr2_out(18),pr2_out(19),pr3_wr_en,clk,or_out);
+    port map(m15_out,m16_out,Imm_out,pr2_out(55 downto 40),D2,pr2_out(11 downto 9),pr2_out(25 downto 23),pr2_out(20),pr2_out(21),pr2_out(33 downto 32),pr2_out(34),pr2_out(28 downto 27),pr2_out(35),pr2_out(39 downto 36),pr2_out(18),pr2_out(19),pr3_wr_en,clk,or_out);
+
+    p1_m15:process(op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,m4_out,dest_data,dest_add)
+    begin
+        if op = "0001" or op = "0000" or op = "0010" or op = "1111" or op = "1000" or op = "1001" or op = "1010" or op = "0100" or op = "0101"  then
+            if pr2_out(14 downto 12) = ex_dest then
+                m15_out<= ex_data;
+            elsif pr2_out(14 downto 12) = macc_dest then
+                m15_out<=macc_data;
+            elsif pr2_out(14 downto 12) = dest_add then
+                m15_out<=dest_data;
+            else 
+                m15_out<=m4_out;
+            end if;
+        else
+            m15_out<=m4_out;
+        end if;
+    end process;
+
+    p1_m16:process(op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,m2_out,dest_data,dest_add)
+    begin
+        if  op = "1000" or op = "1001" or op = "1010" or op = "1101" then
+            if pr2_out(17 downto 15) = ex_dest then
+                m16_out<= ex_data;
+            elsif pr2_out(17 downto 15) = macc_dest then
+                m16_out<=macc_data;
+            elsif pr2_out(17 downto 15) = dest_add then
+                m16_out<=dest_data;
+            else 
+                m16_out<=m2_out;
+            end if;
+        else
+            m16_out<=m2_out;
+        end if;
+    end process ;
+
 end architecture;

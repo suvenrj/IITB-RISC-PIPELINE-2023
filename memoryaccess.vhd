@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity memoryaccess is 
-    port (clk: in std_logic;pr4:std_logic_vector(54 downto 0);pr5_en: in std_logic;mem_stage_out: out std_logic_vector(19 downto 0));
+    port (clk: in std_logic;pr4:std_logic_vector(54 downto 0);pr5_en: in std_logic;mem_stage_out: out std_logic_vector(19 downto 0);macc_data:out std_logic_vector(15 downto 0);macc_dest:out std_logic_vector(2 downto 0));
 end entity;
 
 architecture beh_mem of memoryaccess is 
@@ -42,6 +42,9 @@ architecture beh_mem of memoryaccess is
         pr5_reg :pr5
         port map(clk,m5_out,pr4(19),pr4(18 downto 16),pr5_en,mem_stage_out);
 
+        macc_data<=m5_out;
+        macc_dest<=pr4(18 downto 16);
+        
 
 
 end architecture;

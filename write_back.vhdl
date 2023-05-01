@@ -6,7 +6,7 @@ entity write_back is
     reg_write_en_out: out std_logic;
     data_out: out std_logic_vector(15 downto 0); 
     dest_reg_out: out std_logic_vector(2 downto 0); 
-    pr5_out : in std_logic_vector(19 downto 0); 
+    pr5_out : in std_logic_vector(19 downto 0)
 );
 end entity;
 
