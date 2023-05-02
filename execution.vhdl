@@ -8,7 +8,8 @@ entity exec is
     ex_out:out std_logic_vector(54 downto 0);
     REGA_data: out std_logic_vector(15 downto 0); decoder2_out:out std_logic_vector(2 downto 0);
     se_out,ALU_C_out:out  std_logic_vector(15 downto 0);M14_Control:out std_logic;
-    ex_dest: out std_logic_vector(2 downto 0));
+    ex_dest: out std_logic_vector(2 downto 0);
+	opcode: out std_logic_vector(2 downto 0));
 end entity exec;
 
 -- data 1 and data 2 are for ALU but data_imm is needed for beq instr
@@ -86,6 +87,7 @@ architecture bhv_exec of exec is
     signal comp_out,m6_out,alu_out:std_logic_vector(15 downto 0);
     signal pr4_outt: std_logic_vector(54 downto 0);
     begin
+	opcode <= pr3(67 downto 64);
         cp1: complimenter
         port map(pr3(47 downto 32),comp_out);
 
