@@ -41,9 +41,9 @@ begin
 	Cy <= pr1(1);
 	Z <= pr1(0);
 	A1 <= not pr1(15);
-	B1 <= not pr1(13);
-	C1 <= not pr1(12);
-	D1 <= not pr1(11);
+	B1 <= not pr1(14);
+	C1 <= not pr1(13);
+	D1 <= not pr1(12);
 	--Co1 <= not pr1(2); -- never used
 	Cy1 <= not pr1(1);
 	Z1 <= not pr1(0);
