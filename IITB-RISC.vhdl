@@ -68,7 +68,7 @@ end component;
 component load_hazard_detector is
     port (load_dest, reg_a, reg_b: in std_logic_vector(2 downto 0); 
         opcode: in std_logic_vector(3 downto 0);
-        prev_hazard_out, hazard_out, clk, pc_en, pr1_en, pr2_en: out std_logic;
+        prev_hazard_out, hazard_out, clk, pc_en, pr1_en, pr2_en: out std_logic
         );
 end component;
 
