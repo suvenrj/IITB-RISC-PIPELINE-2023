@@ -14,7 +14,8 @@ architecture behave of instruction_fetch is
     signal c_6,c_2,s1,s2,s3,s4,s5,s6,s7,s8: std_logic_vector(15 downto 0);
 
     component pc_register is
-        port (pc_in: in std_logic_vector(15 downto 0); pc_out : out std_logic_vector(15 downto 0); clock: in std_logic; pc_write_en: in std_logic);
+        port (pc_in: in std_logic_vector(15 downto 0); pc_out : out std_logic_vector(15 downto 0); clock: in std_logic; pc_write_en: in std_logic;
+	     pc_reset: in std_logic);
     end component;
     
     component alu_pc_2 is 
@@ -36,6 +37,7 @@ architecture behave of instruction_fetch is
         port(Instr : in std_logic_vector(15 downto 0); 
                 pr1_wr_en: in std_logic;
                 clk: in std_logic;
+	     	reset: in std_logic;
                 pr1_out: out std_logic_vector(15 downto 0)); 
     
     end component;
