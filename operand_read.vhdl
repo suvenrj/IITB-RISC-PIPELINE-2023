@@ -10,7 +10,7 @@ entity operand_read is
          clk:in std_logic;
          ex_data,macc_data: in std_logic_vector(15 downto 0);
          ex_dest,macc_dest: in std_logic_vector(2 downto 0);
-
+	 reg_a_adr, reg_b_adr: out std_logic_vector(2 downto 0);
          or_out:out std_logic_vector(99 downto 0));
 end entity;
 
@@ -80,6 +80,8 @@ end component;
 
 signal D1,D2,imm_out,M2_out,M4_out: std_logic_vector(15 downto 0);
 begin 
+    reg_a_adr <= pr2_out(14 downto 12);
+    reg_b_adr <= pr2_out(17 downto 15);
     op <= pr2_out(39 downto 36);
     reg_file:regfi
     port map(clk,rf_wr_en,pr2_out(14 downto 12),pr2_out(17 downto 15),dest_add,dest_data,D1,D2);
