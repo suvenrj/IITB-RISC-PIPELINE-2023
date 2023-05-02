@@ -27,5 +27,5 @@ begin
 	
 	M7_control <= (A and B and D1 ) or (A and B1 and (E or F));
 	M8_control <= (A and B and D1 ) or (A and B1 and (E or F));
-    M9_control <= not((A and B and ((C and D)or(C1 and D1))) or(A and B and  (E or F)));
+    M9_control <= not((A and B and ((C and D)or(C1 and D1))) or(A and B1 and  (E or F)));
 end architecture;
