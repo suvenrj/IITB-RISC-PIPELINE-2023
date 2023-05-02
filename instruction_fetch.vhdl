@@ -23,7 +23,7 @@ architecture behave of instruction_fetch is
     end component;
     
     component rom is 
-    port (    
+    port (clk : in std_logic;    
           dataPointer   : in std_logic_vector(15 downto 0);      
           do  : out std_logic_vector(15 downto 0));  
     end component; 
@@ -45,8 +45,7 @@ architecture behave of instruction_fetch is
     end component;
 
     begin 
-    pc_next<=s1;
-    c_6 <= "0000000011111010";
+    c_6 <= "1111111111111101";
     c_2 <= "0000000000000001";
     m7 : mux2x1_16bit
         port map(c_2,c_6,m7_cont,s2);
@@ -63,7 +62,8 @@ architecture behave of instruction_fetch is
     PC : pc_register 
         port map(s7, s1, clk,pc_en, pc_reset);
     Inst_mem : rom
-        port map(s1,s8);
+        port map(clk,s1,s8);
     pr1_reg : pr1
         port map(s8,pr1_en,clk,pr1_reset,instruction_out,pr1_reset_synch);
+	 pc_next<=s1;
 end behave;

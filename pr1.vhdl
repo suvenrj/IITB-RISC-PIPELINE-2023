@@ -30,7 +30,7 @@ process (clk,pr1_wr_en, reset_asynch,reset_synch,reg_sig)
 				reg_sig <= (others => '0');
 			end if;
 		else
-			reg_sig <= (others => '0');
+			reg_sig <= reg_sig;
 		end if;
 	else
 		reg_sig <= (others => '0');

@@ -44,6 +44,7 @@ architecture membehave of Memory is
 					--d_out <= d_in;
 				--else
 					--d_out <= storage(to_integer(unsigned(Address)));
+				
 				end if;
 				
 			end if;

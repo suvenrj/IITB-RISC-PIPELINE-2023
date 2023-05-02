@@ -22,7 +22,7 @@ signal reg_sig : std_logic_vector(54 downto 0):=(others => '0');  -- sign_ext co
 
     
 begin 
-	process (clk,reg_sig)
+	process (clk,reg_sig,reset)
     begin
 	if reset = '0' then
 		if rising_edge(clk) then
