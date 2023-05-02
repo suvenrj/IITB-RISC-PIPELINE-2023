@@ -26,6 +26,7 @@ process (clk,pr1_wr_en, reset)
 		end if;
 	else
 		reg_sig <= (others => '0');
+	end if;
 end process;
 pr1_out <= reg_sig;	 
 end behave;
