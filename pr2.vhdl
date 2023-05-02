@@ -12,7 +12,7 @@ end entity;
 
 architecture behave of pr2 is 
 
-signal reg_sig : std_logic_vector(55 downto 0);  -- sign_ext control
+signal reg_sig : std_logic_vector(55 downto 0):=(others => '0');  -- sign_ext control
 
     
 begin 
@@ -24,10 +24,14 @@ process (clk, reset_synch,reset_asynch)
 				if pr2_wr_en = '1' then
 					reg_sig(39 downto 0) <= decoder_out;
 					reg_sig(55 downto 40) <= pc_next;
+				else 
+					reg_sig <= reg_sig;
 				end if;
 			else
 				reg_sig <= (others => '0');
 			end if;
+		else 
+			reg_sig <= reg_sig;
 		end if;
 	else
 		reg_sig <= (others => '0');
