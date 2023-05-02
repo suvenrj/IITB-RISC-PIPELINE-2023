@@ -12,7 +12,7 @@ end entity;
 
 architecture behave of pr1 is 
 
-signal reg_sig : std_logic_vector(15 downto 0);  -- sign_ext control
+signal reg_sig : std_logic_vector(15 downto 0) :=(others => '0');  -- sign_ext control
 
     
 begin 
