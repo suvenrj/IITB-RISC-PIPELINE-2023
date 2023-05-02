@@ -6,8 +6,8 @@ entity pr2 is
          pc_next: in std_logic_vector(15 downto 0);				-- if Instruction at PC is at ID stage then PC_next is PC+2
 			pr2_wr_en: in std_logic;
 			clk: in std_logic;
-		
-			pr2_out: out std_logic_vector(55 downto 0)); 
+			pr2_out: out std_logic_vector(55 downto 0);
+	reset: in std_logic); 
 
 end entity;
 
@@ -17,14 +17,18 @@ signal reg_sig : std_logic_vector(55 downto 0);  -- sign_ext control
 
     
 begin 
-	process (clk)
+process (clk, reset)
     begin
-        if rising_edge(clk) then
-            if pr2_wr_en = '1' then
-                reg_sig(39 downto 0) <= decoder_out;
-				reg_sig(55 downto 40) <= pc_next;
-            end if;
+	if reset = '0' then
+		if rising_edge(clk) then
+		    if pr2_wr_en = '1' then
+			reg_sig(39 downto 0) <= decoder_out;
+			reg_sig(55 downto 40) <= pc_next;
+		    end if;
+		end if;
+	else
+		reg_sig <= (others => '0');
         end if;
-    end process;
-    pr2_out <= reg_sig;	 
+end process;
+pr2_out <= reg_sig;	 
 end behave;
