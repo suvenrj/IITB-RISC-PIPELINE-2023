@@ -27,7 +27,7 @@ component ID is
 end component;
 
 component operand_read is
-    port(pr3_reset: in std_logic;
+    port(pr3_reset_2,pr3_reset: in std_logic;
         pr2_out: in std_logic_vector(55 downto 0);
          dest_add: in std_logic_vector(2 downto 0);
          dest_data: in std_logic_vector(15 downto 0);
@@ -81,7 +81,7 @@ signal s_alu_exec, s_imm_exec, s_pc_next, S_rega_exec,s_df_exec , s_df_wb, s_df_
 signal s_df_adr_exec, s_df_adr_ma, s_df_adr_wb, s_decoder_2, s_reg_a_or, s_reg_b_or:std_logic_vector(2 downto 0);
 signal s_opcode_exec:std_logic_vector(3 downto 0);
 signal s_rf_wr_en,Pr1_en,Pr2_en,Pr3_en,Pr4_en,Pr5_en,s_pc_en,s_m14_control, s_haz, s_prev_haz,s_pc_reset,s_pr1_reset
-,s_pr2_reset,s_pr3_reset,s_pr4_reset,s_pr5_reset:std_logic;
+,s_pr2_reset,s_pr3_reset, s_pr3_reset_2,s_pr4_reset,s_pr5_reset:std_logic;
 begin
     pr3_en<='1';
     pr4_en<='1';
@@ -89,7 +89,8 @@ begin
     s_pc_reset <= reset;
     s_pr1_reset <= reset;
     s_pr2_reset <= reset;
-    s_pr3_reset <= reset or (s_haz and (not s_prev_haz));  -- put 000.. in pr3 when you detect load hazard
+    s_pr3_reset <= reset;
+    s_pr3_reset_2 <= s_haz and (not s_prev_haz);  -- put 000.. in pr3 when you detect load hazard
     s_pr4_reset <= reset;
     s_pr5_reset <= reset;
     iff: instruction_fetch
@@ -99,7 +100,7 @@ begin
     port map(s_pr2_reset,if_id,s_pc_next,pr2_en,clk,id_or);
     
     oper_re: Operand_read
-    port map(s_pr3_reset,id_or,s_df_adr_wb,s_df_wb,s_rf_wr_en,pr3_en,clk,s_df_exec,s_df_ma,s_df_adr_exec,s_df_adr_ma,s_reg_a_or,s_reg_b_or,or_exec);
+    port map(s_pr3_reset_2, s_pr3_reset,id_or,s_df_adr_wb,s_df_wb,s_rf_wr_en,pr3_en,clk,s_df_exec,s_df_ma,s_df_adr_exec,s_df_adr_ma,s_reg_a_or,s_reg_b_or,or_exec);
 
     execution: exec
     port map(s_pr4_reset, clk,or_exec,pr4_en,exec_macc, s_rega_exec, s_decoder_2,s_imm_exec,s_alu_exec,s_m14_control,s_df_adr_exec, s_opcode_exec);
