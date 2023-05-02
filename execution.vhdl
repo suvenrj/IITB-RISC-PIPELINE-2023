@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity exec is
-	port(clk: in std_logic;
+	port(pr4_reset,clk: in std_logic;
     pr3: in std_logic_vector(99 downto 0);
     pr4_en: in std_logic;
     ex_out:out std_logic_vector(54 downto 0);
@@ -107,7 +107,7 @@ architecture bhv_exec of exec is
         port Map(pr3(51),pr3(51),cy_old,z_old,pr3(59 downto 58),m1_out);
 
         pr4_reg: pr4
-        port map(ALU_out,m1_out,pr4_en,pr3(50 downto 48),pr3(52),pr3(61 downto 60),pr3(83 downto 68),pr3(99 downto 84),clk,pr4_outt);
+        port map(ALU_out,m1_out,pr4_en,pr3(50 downto 48),pr3(52),pr3(61 downto 60),pr3(83 downto 68),pr3(99 downto 84),clk,pr4_reset, pr4_outt);
 
         Dec_2: Decoder2
         port map(pr3(67 downto 64),cy_frm_alu,z_frm_alu,M7_control,M8_control,M9_control);
