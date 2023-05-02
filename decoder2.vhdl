@@ -19,12 +19,11 @@ begin
 	D <= OPCODE(0);
     E <= C_alu;
     F <= z_alu;
-	A1 <= not OPCODE(3);
+	
 	B1 <= not OPCODE(2);
 	C1 <= not OPCODE(1);
 	D1 <= not OPCODE(0);
-	E1 <= not C_alu;
-    F1 <= not z_alu;
+	
 	
 	M7_control <= (A and B and D1 ) or (A and B1 and (E or F));
 	M8_control <= (A and B and D1 ) or (A and B1 and (E or F));
