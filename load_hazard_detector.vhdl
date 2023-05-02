@@ -59,7 +59,8 @@ architecture behave of load_hazard_detector is
                 else
                     hazard<='0';
                 end if; 
-            
+            else
+					hazard <='0';
             end if;
         end process;
         
