@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity instruction_fetch is 
-    port (clk: in std_logic; instruction_out : out std_logic_vector(15 downto 0);  
+    port (pc_reset, pr1_reset, clk: in std_logic; instruction_out : out std_logic_vector(15 downto 0);  
     reg_a_data: in std_logic_vector(15 downto 0); reg_b_data: in std_logic_vector(15 downto 0);imm_exec: in std_logic_vector(15 downto 0);
 	m7_cont,m8_cont,m9_cont,m14_cont: in std_logic; pr1_en : in std_logic;pc_en :in std_logic; -- from data hazard
     pc_next:out std_logic_vector(15 downto 0)
@@ -56,9 +56,9 @@ architecture behave of instruction_fetch is
     m14 : mux2x1_16bit
         port map(s6,reg_b_data,m14_cont,s7);
     PC : pc_register 
-        port map(s7, s1, clk,pc_en);
+        port map(s7, s1, clk,pc_en, pc_reset);
     Inst_mem : rom
         port map(s1,s8);
     pr1_reg : pr1
-        port map(s8,pr1_en,clk,instruction_out);
+        port map(s8,pr1_en,clk,pr1_reset,instruction_out);
 end behave;
