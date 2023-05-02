@@ -28,7 +28,7 @@ end entity;
 
 architecture behave of pr3 is 
 
-signal reg_sig : std_logic_vector(99 downto 0);  -- sign_ext control
+signal reg_sig : std_logic_vector(99 downto 0):=(others => '0');  -- sign_ext control
 
     
 begin 
