@@ -2,7 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity operand_read is
-    port(pr3_reset: in std_logic;
+    port(pr3_reset_2: in std_logic;
+	    pr3_reset: in std_logic;
 	 pr2_out: in std_logic_vector(55 downto 0);
          dest_add: in std_logic_vector(2 downto 0);
          dest_data: in std_logic_vector(15 downto 0);
@@ -76,6 +77,7 @@ component pr3 is
         pr3_wr_en: in std_logic;
         clk: in std_logic;
 	 reset : in std_logic;
+	 reset_2: in std_logic;
         pr3_out: out std_logic_vector(99 downto 0)); 
 end component;
 
@@ -97,7 +99,7 @@ begin
     port map(D2,IMM_out,pr2_out(29),m2_out);
 
     pr3_reg: pr3
-    port map(m15_out,m16_out,Imm_out,pr2_out(55 downto 40),D2,pr2_out(11 downto 9),pr2_out(25 downto 23),pr2_out(20),pr2_out(21),pr2_out(33 downto 32),pr2_out(34),pr2_out(28 downto 27),pr2_out(35),pr2_out(39 downto 36),pr2_out(18),pr2_out(19),pr3_wr_en,clk,pr3_reset,or_out);
+    port map(m15_out,m16_out,Imm_out,pr2_out(55 downto 40),D2,pr2_out(11 downto 9),pr2_out(25 downto 23),pr2_out(20),pr2_out(21),pr2_out(33 downto 32),pr2_out(34),pr2_out(28 downto 27),pr2_out(35),pr2_out(39 downto 36),pr2_out(18),pr2_out(19),pr3_wr_en,clk,pr3_reset,pr3_reset_2,or_out);
 
     p1_m15:process(op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,m4_out,dest_data,dest_add)
     begin
