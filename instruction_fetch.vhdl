@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity instruction_fetch is 
-    port (pc_reset, pr1_reset, clk: in std_logic; instruction_out : out std_logic_vector(15 downto 0);  
+    port (pr1_reset_synch,pc_reset, pr1_reset, clk: in std_logic; instruction_out : out std_logic_vector(15 downto 0);  
     reg_a_data: in std_logic_vector(15 downto 0); reg_b_data: in std_logic_vector(15 downto 0);imm_exec: in std_logic_vector(15 downto 0);
 	m7_cont,m8_cont,m9_cont,m14_cont: in std_logic; pr1_en : in std_logic;pc_en :in std_logic; -- from data hazard
     pc_next:out std_logic_vector(15 downto 0)
@@ -27,20 +27,23 @@ architecture behave of instruction_fetch is
           dataPointer   : in std_logic_vector(15 downto 0);      
           do  : out std_logic_vector(15 downto 0));  
     end component; 
+
 	component mux2x1_16bit is
         port(I0: in std_logic_vector(15 downto 0);
              I1: in std_logic_vector(15 downto 0);
              S0: in std_logic;
             I_out:out std_logic_vector(15 downto 0));
     end component;
+
     component pr1 is
         port(Instr : in std_logic_vector(15 downto 0); 
                 pr1_wr_en: in std_logic;
                 clk: in std_logic;
-	     	reset: in std_logic;
-                pr1_out: out std_logic_vector(15 downto 0)); 
-    
+                 reset_asynch: in std_logic;
+                pr1_out: out std_logic_vector(15 downto 0);
+                reset_synch: in std_logic); 
     end component;
+
     begin 
     pc_next<=s1;
     c_6 <= "0000000011111010";
@@ -62,5 +65,5 @@ architecture behave of instruction_fetch is
     Inst_mem : rom
         port map(s1,s8);
     pr1_reg : pr1
-        port map(s8,pr1_en,clk,pr1_reset,instruction_out);
+        port map(s8,pr1_en,clk,pr1_reset,instruction_out,pr1_reset_synch);
 end behave;

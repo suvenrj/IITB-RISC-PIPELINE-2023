@@ -42,7 +42,7 @@ begin
 		  case C2 is
             
             when '1' =>
-            loop2: for j in 1 to 15 loop
+            loop2: for j in 0 to 15 loop
                 Out_sig(j) <= a(j) NAND b(j) ;
                 
             end loop loop2;
@@ -59,7 +59,7 @@ begin
         end case;
 		  
 		  case Out_sig is
-				when (others=>'0') =>
+				when "0000000000000000" =>
 					new_zero <= '1';
 				when others =>
 					new_zero <= '0';

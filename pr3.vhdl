@@ -20,8 +20,8 @@ entity pr3 is
         data_memory_write_en: in std_logic; --
         pr3_wr_en: in std_logic;
         clk: in std_logic;
-	reset : in std_logic;
-	reset_2: in std_logic;
+		reset_asynch : in std_logic;
+		reset_synch: in std_logic;
 	 
         pr3_out: out std_logic_vector(99 downto 0)); 
 end entity;
@@ -32,11 +32,11 @@ signal reg_sig : std_logic_vector(99 downto 0);  -- sign_ext control
 
     
 begin 
-	process (clk,pr3_wr_en)
+	process (clk,pr3_wr_en,reset_asynch,reset_synch)
     begin
-	if reset = '0' then
+	if reset_asynch = '0' then
 		if rising_edge(clk) then
-		    if reset_2 = '1' then
+		    if reset_synch = '1' then
 			    reg_sig <= (others => '0');
 		    else
 			    if pr3_wr_en = '1' then
@@ -59,7 +59,6 @@ begin
 			    else
 				    reg_sig <= reg_sig;
 			    end if;
-				   
 		  end if;
 		end if;
 	else 
