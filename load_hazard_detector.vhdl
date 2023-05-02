@@ -10,7 +10,7 @@ entity load_hazard_detector is
 end entity;
 
 architecture behave of load_hazard_detector is
-    signal hazard, prev_hazard: std_logic;
+    signal hazard, prev_hazard : std_logic := '0';
     begin 
         hazard_out <= hazard;
         prev_hazard_out <= prev_hazard;
@@ -61,6 +61,7 @@ architecture behave of load_hazard_detector is
                 end if; 
             else
 					hazard <='0';
+					
             end if;
         end process;
         
