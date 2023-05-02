@@ -9,7 +9,7 @@ entity exec is
     REGA_data: out std_logic_vector(15 downto 0); decoder2_out:out std_logic_vector(2 downto 0);
     se_out,ALU_C_out:out  std_logic_vector(15 downto 0);M14_Control:out std_logic;
     ex_dest: out std_logic_vector(2 downto 0);
-	opcode: out std_logic_vector(2 downto 0));
+	opcode: out std_logic_vector(3 downto 0));
 end entity exec;
 
 -- data 1 and data 2 are for ALU but data_imm is needed for beq instr
