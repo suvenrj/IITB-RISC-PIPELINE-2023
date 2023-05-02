@@ -32,7 +32,7 @@ signal reg_sig : std_logic_vector(99 downto 0);  -- sign_ext control
 
     
 begin 
-	process (clk,pr3_wr_en,reset_asynch,reset_synch)
+	process (clk,pr3_wr_en,reset_asynch,reset_synch,reg_sig)
     begin
 	if reset_asynch = '0' then
 		if rising_edge(clk) then
@@ -40,26 +40,28 @@ begin
 			    reg_sig <= (others => '0');
 		    else
 			    if pr3_wr_en = '1' then
-				reg_sig(15 downto 0) <= imm;
-						reg_sig(31 downto 16) <= opr1;
-				reg_sig(47 downto 32) <= opr2;
-				reg_sig(50 downto 48) <= dest_reg;
-				reg_sig(51) <= regfi_write_en;
-				reg_sig(52) <= data_memory_write_en;
-				reg_sig(53) <= carry_write_en;
-				reg_sig(54) <= zero_flag_en;
-				reg_sig(57 downto 55) <= alu_control;
-				reg_sig(59 downto 58) <= m1_control;
-				reg_sig(61 downto 60) <= m5_control;
-				reg_sig(62) <= m6_control;
-				reg_sig(63) <= m14_control;
-				reg_sig(67 downto 64) <= opcode;
-				reg_sig(83 downto 68) <= pc_next;
-				reg_sig(99 downto 84) <= reg_a_data_sw;
+					reg_sig(15 downto 0) <= imm;
+					reg_sig(31 downto 16) <= opr1;
+					reg_sig(47 downto 32) <= opr2;
+					reg_sig(50 downto 48) <= dest_reg;
+					reg_sig(51) <= regfi_write_en;
+					reg_sig(52) <= data_memory_write_en;
+					reg_sig(53) <= carry_write_en;
+					reg_sig(54) <= zero_flag_en;
+					reg_sig(57 downto 55) <= alu_control;
+					reg_sig(59 downto 58) <= m1_control;
+					reg_sig(61 downto 60) <= m5_control;
+					reg_sig(62) <= m6_control;
+					reg_sig(63) <= m14_control;
+					reg_sig(67 downto 64) <= opcode;
+					reg_sig(83 downto 68) <= pc_next;
+					reg_sig(99 downto 84) <= reg_a_data_sw;
 			    else
 				    reg_sig <= reg_sig;
 			    end if;
-		  end if;
+			end if;
+		else
+			reg_sig <= reg_sig;
 		end if;
 	else 
 		reg_sig <= (others => '0');

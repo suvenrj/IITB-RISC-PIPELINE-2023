@@ -16,17 +16,21 @@ signal reg_sig : std_logic_vector(15 downto 0) :=(others => '0');  -- sign_ext c
 
     
 begin 
-process (clk,pr1_wr_en, reset_asynch,reset_synch)
+process (clk,pr1_wr_en, reset_asynch,reset_synch,reg_sig)
     begin
 	if reset_asynch = '0' then
 		if rising_edge(clk) then
 			if reset_synch = '0' then
 				if pr1_wr_en = '1' then
-				reg_sig <= instr;
+					reg_sig <= instr;
+				else
+				reg_sig <= reg_sig ;
 				end if;
 			else 
 				reg_sig <= (others => '0');
 			end if;
+		else
+			reg_sig <= (others => '0');
 		end if;
 	else
 		reg_sig <= (others => '0');

@@ -16,7 +16,7 @@ signal reg_sig : std_logic_vector(55 downto 0):=(others => '0');  -- sign_ext co
 
     
 begin 
-process (clk, reset_synch,reset_asynch)
+process (clk, reset_synch,reset_asynch,reg_sig)
     begin
 	if reset_asynch = '0' then
 		if rising_edge(clk) then
