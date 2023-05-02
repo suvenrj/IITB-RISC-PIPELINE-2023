@@ -73,7 +73,7 @@ architecture bhv_exec of exec is
                 PC_next:in std_logic_vector(15 downto 0);
                 Ra_value:in std_logic_vector(15 downto 0);
                 clk: in std_logic;
-            
+            	reset: in std_logic;
                 pr4_out: out std_logic_vector(54 downto 0)); 
     end component;
 
