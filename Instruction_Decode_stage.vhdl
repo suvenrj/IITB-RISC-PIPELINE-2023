@@ -2,7 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity ID is
-    port(pr1_out : in std_logic_vector(15 downto 0); 
+    port(pr2_reset: in std_logic;
+	 pr1_out : in std_logic_vector(15 downto 0); 
          pc_next : in std_logic_vector(15 downto 0);
          pr2_en: in std_logic;
          clk : in std_logic;
@@ -43,7 +44,7 @@ begin
         port map(pr1_out,dec_pr2);
 
     pipeline_reg: pr2
-        port map(dec_pr2,pc_next,pr2_en,clk,ID_out);
+        port map(dec_pr2,pc_next,pr2_en,clk,ID_out, pr2_reset);
 
     	 
 end behave;
