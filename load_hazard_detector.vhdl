@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 
 entity load_hazard_detector is
     port (load_dest, reg_a, reg_b: in std_logic_vector(2 downto 0); 
-        opcode: in std_logic_vector(3 downto 0);
+        opcode_exec, opcode_rr: in std_logic_vector(3 downto 0);
         clk:in std_logic;
         prev_hazard_out, hazard_out,  pc_en, pr1_en, pr2_en: out std_logic
         );
@@ -37,23 +37,23 @@ architecture behave of load_hazard_detector is
             end if;
         end process;
         
-        p3: process(opcode,load_dest,reg_a,reg_b)
+        p3: process(opcode_exec, opcode_rr,load_dest,reg_a,reg_b)
         begin
-            if3: if (opcode = "0001" or opcode = "0010" or opcode = "1000" or opcode = "1001" or opcode = "1010") then
+            if3: if ((opcode_exec = '0100' or opcode_exec = '0011') and (opcode_rr = "0001" or opcode_rr = "0010" or opcode_rr = "1000" or opcode_rr = "1001" or opcode_rr = "1010")) then
                 if (reg_a = load_dest or reg_b = load_dest) then
                     hazard <= '1';
                 else
                     hazard <= '0';
                 end if;
 
-            elsif (opcode = "0100" or opcode = "0101" or opcode = "1101") then
+            elsif ((opcode_exec = '0100' or opcode_exec = '0011') and (opcode_rr = "0100" or opcode_rr = "0101" or opcode_rr = "1101")) then
                 if (reg_b = load_dest) then
                     hazard<='1';
                 else
                     hazard<='0';
                 end if;
 
-            elsif (opcode = "1111") then
+            elsif ((opcode_exec = '0100' or opcode_exec = '0011') and opcode_rr = "1111") then
                 if (reg_a = load_dest) then
                     hazard<='1';
                 else
