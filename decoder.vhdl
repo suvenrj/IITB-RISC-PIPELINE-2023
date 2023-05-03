@@ -29,7 +29,7 @@ component mux4x1 is
 end component;
 	
 
-signal A,B,C,D,Co,Cy,Z,A1,B1,C1,D1,Cy1,Z1,zero: std_logic;  -- sign_ext control
+signal A,B,C,D,Co,Cy,Z,A1,B1,C1,D1,Cy1,Z1,zero,m11,m22: std_logic;  -- sign_ext control
 
     
 begin 
@@ -72,11 +72,13 @@ begin
 	D_out(33) <= B; 						--M5-C1
 	D_out(34) <= (A and B1) or (B1 and C1 and D and Co) or (B1 and C and D1 and Co); 			--M6
 	D_out(35) <= not(not(A and B) or C or D1) ;		--M14
+	m11<=A1 and (C1 or B1);
+	m22<=A1 and B and C1 and D;
 	m1: mux2x1 
 	port map(
 		pr1(11 downto 9),
 		pr1(8 downto 6),
-		A1 and (C1 or B1),
+		m11,
 		D_out(14 downto 12)
 	);
 	m2: mux4x1 
@@ -86,7 +88,7 @@ begin
 		pr1(11 downto 9),
 		pr1(11 downto 9),
 		A1,
-		A1 and B and C1 and D,
+		m22,
 		D_out(17 downto 15)
 	);
 
