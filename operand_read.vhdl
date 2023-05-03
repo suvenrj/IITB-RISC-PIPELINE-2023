@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 entity operand_read is
     port(pr3_reset_synch: in std_logic;
 	    pr3_reset_asynch: in std_logic;
-	 pr2_out: in std_logic_vector(55 downto 0);
+	    pr2_out: in std_logic_vector(55 downto 0);
          dest_add: in std_logic_vector(2 downto 0);
          dest_data: in std_logic_vector(15 downto 0);
          rf_wr_en: in std_logic;
@@ -12,8 +12,9 @@ entity operand_read is
          clk:in std_logic;
          ex_data,macc_data: in std_logic_vector(15 downto 0);
          ex_dest,macc_dest: in std_logic_vector(2 downto 0);
-	 reg_a_adr, reg_b_adr: out std_logic_vector(2 downto 0);
-         or_out:out std_logic_vector(99 downto 0));
+	    reg_a_adr, reg_b_adr: out std_logic_vector(2 downto 0);
+         or_out:out std_logic_vector(99 downto 0);
+         opcode_for_lhd:out std_logic_vector(3 downto 0));
 end entity;
 
 architecture behave_or of operand_read is 
@@ -87,6 +88,7 @@ begin
     reg_a_adr <= pr2_out(14 downto 12);
     reg_b_adr <= pr2_out(17 downto 15);
     op <= pr2_out(39 downto 36);
+    opcode_for_lhd<=op;
     reg_file:regfi
     port map(clk,rf_wr_en,pr2_out(14 downto 12),pr2_out(17 downto 15),dest_add,dest_data,D1,D2);
 
