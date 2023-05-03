@@ -12,8 +12,8 @@ entity Memory is
 end entity; 
 
 architecture membehave of Memory is 
-	type RAM is array(0 to 256) of std_logic_vector(15 downto 0);
-	signal storage: RAM :=(1=>"0011000000000100",2=>"0011001000000010",3=>"0001000001010000",others=>(others=>'0'));
+	type RAM is array(0 to 255) of std_logic_vector(15 downto 0);
+	signal storage: RAM :=(1=>"0011000000000100",2=>"0000000000011111",3=>"0001000001010000",others=>(others=>'0'));
 	
 	begin
 	

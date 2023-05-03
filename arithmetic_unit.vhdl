@@ -55,7 +55,7 @@ begin
                 carry_over(i) <= (a(i) and b(i)) or (a(i) and carry_over(i-1)) or (b(i) and carry_over(i-1));
             end loop loop1;
             
-            new_cy <= carry_over(15);
+            new_cy <= carry_over(15) xor Cy;
         end case;
 		  
 		  case Out_sig is

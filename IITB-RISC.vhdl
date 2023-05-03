@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity IITB_RISC is
-    port(clk, reset:in std_logic);
+    port(clk, reset:in std_logic;dummy:out std_logic_vector(15 downto 0));
 end entity;
 
 architecture behav_cpu of IITB_risc is
@@ -91,6 +91,7 @@ signal s_rf_wr_en,Pr1_en,Pr2_en,Pr3_en,Pr4_en,Pr5_en,s_pc_en,s_m14_control, s_pr
 ,s_pr2_reset,s_pr3_reset, s_pr3_reset_2,s_pr4_reset,s_pr5_reset,b_haz:std_logic;
 signal s_rf_wr_ex_en,s_rf_wr_ma_en :std_logic;
 begin
+	 dummy <=s_df_wb;
     pr3_en<='1';
     pr4_en<='1';
     pr5_en<='1';
