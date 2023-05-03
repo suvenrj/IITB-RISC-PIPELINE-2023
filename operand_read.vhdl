@@ -8,6 +8,8 @@ entity operand_read is
          dest_add: in std_logic_vector(2 downto 0);
          dest_data: in std_logic_vector(15 downto 0);
          rf_wr_en: in std_logic;
+         rf_wr_ex_en:in std_logic;
+         rf_wr_ma_en:in std_logic;
          pr3_wr_en:in std_logic;
          clk:in std_logic;
          ex_data,macc_data: in std_logic_vector(15 downto 0);
@@ -107,11 +109,11 @@ begin
     p1_m15:process(op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,m4_out,dest_data,dest_add)
     begin
         if op = "0001" or op = "0000" or op = "0010" or op = "1111" or op = "1000" or op = "1001" or op = "1010" or op = "0100" or op = "0101"  then
-            if pr2_out(14 downto 12) = ex_dest then
+            if pr2_out(14 downto 12)  = ex_dest and rf_wr_ex_en = '1'  then
                 m15_out<= ex_data;
-            elsif pr2_out(14 downto 12) = macc_dest then
+            elsif pr2_out(14 downto 12) = macc_dest  and rf_wr_ma_en = '1' then
                 m15_out<=macc_data;
-            elsif pr2_out(14 downto 12) = dest_add then
+            elsif pr2_out(14 downto 12) = dest_add and rf_wr_en = '1' then
                 m15_out<=dest_data;
             else 
                 m15_out<=m4_out;
@@ -124,11 +126,11 @@ begin
     p1_m16:process(op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,m2_out,dest_data,dest_add)
     begin
         if  op = "1000" or op = "1001" or op = "1010" or op = "1101" then
-            if pr2_out(17 downto 15) = ex_dest then
+            if pr2_out(17 downto 15) = ex_dest and rf_wr_ex_en = '1' then
                 m16_out<= ex_data;
-            elsif pr2_out(17 downto 15) = macc_dest then
+            elsif pr2_out(17 downto 15) = macc_dest  and rf_wr_ma_en = '1' then
                 m16_out<=macc_data;
-            elsif pr2_out(17 downto 15) = dest_add then
+            elsif pr2_out(17 downto 15) = dest_add  and rf_wr_en = '1'then
                 m16_out<=dest_data;
             else 
                 m16_out<=m2_out;

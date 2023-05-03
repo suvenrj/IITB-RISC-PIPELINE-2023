@@ -10,7 +10,8 @@ entity execution is
     se_out,ALU_C_out:out  std_logic_vector(15 downto 0);M14_Control:out std_logic;
     ex_dest: out std_logic_vector(2 downto 0);
 	opcode: out std_logic_vector(3 downto 0);
-    branch_haz: out std_logic);
+    branch_haz: out std_logic;
+    rf_wr_ex_en:out std_logic);
 end entity ;
 
 -- data 1 and data 2 are for ALU but data_imm is needed for beq instr
@@ -95,6 +96,7 @@ architecture bhv_exec of execution is
     signal pr4_outt: std_logic_vector(54 downto 0);
     begin
 	opcode <= pr3(67 downto 64);
+    rf_wr_ex_en<=m1_out;
         cp1: complimenter
         port map(pr3(47 downto 32),comp_out);
 
