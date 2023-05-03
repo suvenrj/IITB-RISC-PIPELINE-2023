@@ -39,21 +39,21 @@ architecture behave of load_hazard_detector is
         
         p3: process(opcode_exec, opcode_rr,load_dest,reg_a,reg_b)
         begin
-            if3: if ((opcode_exec = '0100' or opcode_exec = '0011') and (opcode_rr = "0001" or opcode_rr = "0010" or opcode_rr = "1000" or opcode_rr = "1001" or opcode_rr = "1010")) then
+            if3: if ((opcode_exec = "0100" or opcode_exec = "0011") and (opcode_rr = "0001" or opcode_rr = "0010" or opcode_rr = "1000" or opcode_rr = "1001" or opcode_rr = "1010")) then
                 if (reg_a = load_dest or reg_b = load_dest) then
                     hazard <= '1';
                 else
                     hazard <= '0';
                 end if;
 
-            elsif ((opcode_exec = '0100' or opcode_exec = '0011') and (opcode_rr = "0100" or opcode_rr = "0101" or opcode_rr = "1101")) then
+            elsif ((opcode_exec = "0100" or opcode_exec = "0011") and (opcode_rr = "0100" or opcode_rr = "0101" or opcode_rr = "1101")) then
                 if (reg_b = load_dest) then
                     hazard<='1';
                 else
                     hazard<='0';
                 end if;
 
-            elsif ((opcode_exec = '0100' or opcode_exec = '0011') and opcode_rr = "1111") then
+            elsif ((opcode_exec = "0100" or opcode_exec = "0011") and opcode_rr = "1111") then
                 if (reg_a = load_dest) then
                     hazard<='1';
                 else
