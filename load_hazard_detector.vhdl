@@ -5,16 +5,15 @@ entity load_hazard_detector is
     port (load_dest, reg_a, reg_b: in std_logic_vector(2 downto 0); 
         opcode_exec, opcode_rr: in std_logic_vector(3 downto 0);
         clk:in std_logic;
-        prev_hazard_out, hazard_out,  pc_en, pr1_en, pr2_en: out std_logic
+			pr3_synch_reset_lhd,pc_en, pr1_en, pr2_en: out std_logic
         );
 end entity;
 
 architecture behave of load_hazard_detector is
     signal hazard, prev_hazard : std_logic := '0';
     begin 
-        hazard_out <= hazard;
-        prev_hazard_out <= prev_hazard;
-
+			
+		pr3_synch_reset_lhd <= hazard and not(prev_hazard);
         p1: process (clk,prev_hazard,hazard)
         begin
             if rising_edge(clk) then
