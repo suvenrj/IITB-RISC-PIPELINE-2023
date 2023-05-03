@@ -73,9 +73,9 @@ end component;
 
 component load_hazard_detector is
     port (load_dest, reg_a, reg_b: in std_logic_vector(2 downto 0); 
-        opcode: in std_logic_vector(3 downto 0);
-        clk: in std_logic;
-        prev_hazard_out, hazard_out, pc_en, pr1_en, pr2_en: out std_logic
+        opcode_exec, opcode_rr: in std_logic_vector(3 downto 0);
+        clk:in std_logic;
+			pr3_synch_reset_lhd,pc_en, pr1_en, pr2_en: out std_logic
         );
 end component;
 
@@ -84,10 +84,10 @@ signal id_or:std_logic_vector(55 downto 0);
 signal or_exec:std_logic_vector(99 downto 0);
 signal exec_macc:std_logic_vector(54 downto 0);
 signal macc_wb:std_logic_vector(19 downto 0);
-signal s_alu_exec, s_imm_exec, s_pc_next, S_rega_exec,s_df_exec , s_df_wb, s_df_ma, junk: std_logic_vector(15 downto 0);
+signal s_alu_exec, s_imm_exec, s_pc_next, S_rega_exec , s_df_wb, s_df_ma, junk: std_logic_vector(15 downto 0);
 signal s_df_adr_exec, s_df_adr_ma, s_df_adr_wb, s_decoder_2, s_reg_a_or, s_reg_b_or:std_logic_vector(2 downto 0);
-signal s_opcode_exec:std_logic_vector(3 downto 0);
-signal s_rf_wr_en,Pr1_en,Pr2_en,Pr3_en,Pr4_en,Pr5_en,s_pc_en,s_m14_control, s_haz, s_prev_haz,s_pc_reset,s_pr1_reset
+signal s_opcode_exec,s_opcode_rr:std_logic_vector(3 downto 0);
+signal s_rf_wr_en,Pr1_en,Pr2_en,Pr3_en,Pr4_en,Pr5_en,s_pc_en,s_m14_control, s_pr3_synch_reset_lhd,s_pc_reset,s_pr1_reset
 ,s_pr2_reset,s_pr3_reset, s_pr3_reset_2,s_pr4_reset,s_pr5_reset,b_haz:std_logic;
 signal s_rf_wr_ex_en,s_rf_wr_ma_en :std_logic;
 begin
@@ -98,7 +98,7 @@ begin
     s_pr1_reset <= reset;
     s_pr2_reset <= reset;
     s_pr3_reset <= reset;
-    s_pr3_reset_2 <= (s_haz and (not s_prev_haz)) or b_haz;  -- put 000.. in pr3 when you detect load hazard
+    s_pr3_reset_2 <= s_pr3_synch_reset_lhd or b_haz;  -- put 000.. in pr3 when you detect load hazard
     s_pr4_reset <= reset;
     s_pr5_reset <= reset;
 
@@ -109,7 +109,7 @@ begin
     port map(b_haz,s_pr2_reset,if_id,s_pc_next,pr2_en,clk,id_or);
     
     oper_re: Operand_read
-    port map(s_pr3_reset_2, s_pr3_reset,id_or,s_df_adr_wb,s_df_wb,s_rf_wr_en,s_rf_wr_ex_en,s_rf_wr_ma_en,pr3_en,clk,s_df_exec,s_df_ma,s_df_adr_exec,s_df_adr_ma,s_reg_a_or,s_reg_b_or,or_exec);
+    port map(s_pr3_reset_2, s_pr3_reset,id_or,s_df_adr_wb,s_df_wb,s_rf_wr_en,s_rf_wr_ex_en,s_rf_wr_ma_en,pr3_en,clk,s_alu_exec,s_df_ma,s_df_adr_exec,s_df_adr_ma,s_reg_a_or,s_reg_b_or,or_exec,s_opcode_rr);
 
     exec: execution
     port map(s_pr4_reset, clk,or_exec,pr4_en,exec_macc, s_rega_exec, s_decoder_2,s_imm_exec,s_alu_exec,s_m14_control,s_df_adr_exec, s_opcode_exec,b_haz,s_rf_wr_ex_en);
@@ -121,6 +121,6 @@ begin
     port map(s_rf_wr_en, s_df_wb, s_df_adr_wb, macc_wb);
 
     load_haz : load_hazard_detector
-    port map(s_df_adr_exec, s_reg_a_or, s_reg_b_or, s_opcode_exec,clk, s_prev_haz, s_haz, s_pc_en, pr1_en, pr2_en );
+    port map(s_df_adr_exec, s_reg_a_or, s_reg_b_or, s_opcode_exec,s_opcode_rr,clk, s_pr3_synch_reset_lhd, s_pc_en, pr1_en, pr2_en );
 
 end architecture;

@@ -18,7 +18,7 @@ architecture membehave of Memory is
 	begin
 	
 			
-	process(clock,d_in)
+	process(clock,d_in,storage,address)
 		begin
 			
 			--report "dataPointer:"&integer'image(to_integer(unsigned(dataPointer)));
@@ -48,8 +48,8 @@ architecture membehave of Memory is
 				end if;
 				
 			end if;
-			d_out<= d_in;
-				--d_out <= storage(to_integer(unsigned(Address)));
+			--d_out<= d_in;
+				d_out <= storage(to_integer(unsigned(Address)));
 	end process; 
 	
 	
