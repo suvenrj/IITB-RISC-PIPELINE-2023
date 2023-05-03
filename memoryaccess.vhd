@@ -34,18 +34,28 @@ architecture beh_mem of memoryaccess is
         ); 
     
     end component;
+	 
+	 component modder is
+	 port (
+		input: in std_logic_vector(15 downto 0);
+		output: out std_logic_vector(15 downto 0)) ;
+	 end component;
 
-    signal mem_data,m5_out: std_logic_vector(15 downto 0);
+    signal mem_data,m5_out,Alu_C_sig,Addr_mod_256: std_logic_vector(15 downto 0);
 
     begin
-        rf_wr_ma_en<=pr4(19);
-        ram1: Memory port map(pr4(20),clk, pr4(15 downto 0) , pr4(54 downto 39), mem_data);
+        Alu_C_sig <= pr4(15 downto 0);
+		  rf_wr_ma_en<=pr4(19);
+        ram1: Memory port map(pr4(20),clk, Addr_mod_256 , pr4(54 downto 39), mem_data);
 
         M5: mux4x1_16
-        port map(pr4(15 downto 0),pr4(15 downto 0),mem_data,pr4(38 downto 23),pr4(22 downto 21),m5_out);
+        port map(pr4(15 downto 0),Alu_C_sig,mem_data,pr4(38 downto 23),pr4(22 downto 21),m5_out);
 
         pr5_reg :pr5
         port map(clk,m5_out,pr4(19),pr4(18 downto 16),pr5_en,pr5_reset, mem_stage_out);
+		  
+		  modulo : modder
+		  port map(Alu_C_sig,Addr_mod_256);
 
         macc_data<=m5_out;
         macc_dest<=pr4(18 downto 16);
