@@ -215,6 +215,7 @@
      17. 35 **M14**
      18. 39-36 **OPCODE**
      19. 55-40 **PC Next**
+     20. 56 **Imm_reg_en** (for lmsm)
   2. **OPCODE Decoder**
      1. **T1 T0**
      -  0  0 -**R Type**

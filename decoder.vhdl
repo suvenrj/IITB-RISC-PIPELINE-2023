@@ -3,7 +3,8 @@ use ieee.std_logic_1164.all;
 
 entity Decoder is
     port(pr1 : in std_logic_vector(15 downto 0); 
-         D_out: out std_logic_vector(39 downto 0)); 
+         D_out: out std_logic_vector(39 downto 0);
+			ori_op : in std_logic_vector(3 downto 0)); --original opcode
 end entity;
 
 
@@ -13,8 +14,8 @@ end entity;
 architecture behave of Decoder is 
 
 component mux2x1 is
-	port(I1: in std_logic_vector(2 downto 0);
-	     I2: in std_logic_vector(2 downto 0);
+	port(I0: in std_logic_vector(2 downto 0);
+	     I1: in std_logic_vector(2 downto 0);
 		 S0: in std_logic;
 		I_out:out std_logic_vector(2 downto 0));
 end component;
@@ -57,7 +58,8 @@ begin
 	D_out(18) <= (A1 and  B1) or (A1 and  D1) or (A and  C1 and B) ; --Register File write enable
 	D_out(19) <= (A1 and  B and D)  ; 				--Data Memory write enable
 	D_out(20) <= (A1 and B1 and C1); 				-- C flag Write enable
-	D_out(21) <= (A1 and B1 and C1) or (A1 and B1 and D1) or (A1 and C1 and D1);		-- Z flag enable
+	D_out(21) <= (not(not(ori_op(0))and(ori_op(1)) and(ori_op(2)) and not(ori_op(3))))
+						and ((A1 and B1 and C1) or (A1 and B1 and D1) or (A1 and C1 and D1));		-- Z flag enable
 	D_out(22) <= pr1(2);								-- Compliment bit	*Not used further yet*
 	D_out(23) <= (A and B1);							-- ALU(C0)
 	D_out(24) <= not(A or B) and (not(C or D1)) and (Cy and Z);						-- ALU(C1)
@@ -66,12 +68,15 @@ begin
 	D_out(27) <=  Z;				--M1_C0
 	D_out(28) <= (B1) and (A1) and (C or D) and (Cy or Z) and (Cy1 or Z1) and (C1 or D1);		-- M1_C1
 	D_out(29) <= ((A1 and B) or (C and D) or (A1 and C1 and D1));									-- M2
-	D_out(30) <= A1 and pr1(8);				--M4-C0
+	D_out(30) <= A1 and pr1(8);				--M4-C0  -- pr(8) 9th bit in inst; MSB in IMM9
 	D_out(31) <= (D1) or (A1 and C1) or (A and B1) or (B and C);				--M4-C1
 	D_out(32) <= A;						-- M5-C0
 	D_out(33) <= B; 						--M5-C1
 	D_out(34) <= (A and B1) or (B1 and C1 and D and Co) or (B1 and C and D1 and Co); 			--M6
 	D_out(35) <= not(not(A and B) or C or D1) ;		--M14
+	
+	
+	
 	m11<=A1 and (C1 or B1);
 	m22<=A1 and B and C1 and D;
 	m1: mux2x1 
