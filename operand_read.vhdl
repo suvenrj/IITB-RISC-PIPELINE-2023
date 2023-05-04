@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 entity operand_read is
     port(pr3_reset_synch: in std_logic;
 	    pr3_reset_asynch: in std_logic;
-	    pr2_out: in std_logic_vector(55 downto 0);
+	    pr2_out: in std_logic_vector(56 downto 0);
          dest_add: in std_logic_vector(2 downto 0);
          dest_data: in std_logic_vector(15 downto 0);
          rf_wr_en: in std_logic;
@@ -85,7 +85,14 @@ component pr3 is
         pr3_out: out std_logic_vector(99 downto 0)); 
 end component;
 
+component temporary_register is
+    port (input  : in  std_logic_vector(15 downto 0);
+          enable : in  std_logic;
+          output : out std_logic_vector(15 downto 0));
+end component temporary_register;
+
 signal D1,D2,imm_out,M2_out,M4_out: std_logic_vector(15 downto 0);
+signal tr_op:std_logic_vector(15 downto 0);
 begin 
     reg_a_adr <= pr2_out(14 downto 12);
     reg_b_adr <= pr2_out(17 downto 15);
@@ -98,15 +105,18 @@ begin
     port map(pr2_out(5 downto 0),pr2_out(8 downto 0),pr2_out(26),IMM_out);
 
     m4: mux4x1_16
-    port map("0000000000000000","0000001000000000",D1,D1,pr2_out(31 downto 30),M4_out);
+    port map("0000000000000000","0000001000000000",tr_op,tr_op,pr2_out(31 downto 30),M4_out);
 
     m2: mux2x1_16bit
     port map(D2,IMM_out,pr2_out(29),m2_out);
 
     pr3_reg: pr3
     port map(m15_out,m16_out,Imm_out,pr2_out(55 downto 40),D2,pr2_out(11 downto 9),pr2_out(25 downto 23),pr2_out(20),pr2_out(21),pr2_out(33 downto 32),pr2_out(34),pr2_out(28 downto 27),pr2_out(35),pr2_out(39 downto 36),pr2_out(18),pr2_out(19),pr3_wr_en,clk,pr3_reset_asynch,pr3_reset_synch,or_out);
-
-    p1_m15:process(op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,m4_out,dest_data,dest_add)
+	 
+	 tr :temporary_register
+	 port map(D1,pr2_out(56),tr_op);
+	 
+    p1_m15:process(op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,m4_out,dest_data,dest_add,rf_wr_ex_en,rf_wr_ma_en,rf_wr_en)
     begin
         if op = "0001" or op = "0000" or op = "0010" or op = "1111" or op = "1000" or op = "1001" or op = "1010" or op = "0100" or op = "0101"  then
             if pr2_out(14 downto 12)  = ex_dest and rf_wr_ex_en = '1'  then
@@ -123,7 +133,7 @@ begin
         end if;
     end process;
 
-    p1_m16:process(op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,m2_out,dest_data,dest_add)
+    p1_m16:process(op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,m2_out,dest_data,dest_add,rf_wr_ex_en,rf_wr_ma_en,rf_wr_en)
     begin
         if  op = "1000" or op = "1001" or op = "1010" or op = "1101" then
             if pr2_out(17 downto 15) = ex_dest and rf_wr_ex_en = '1' then

@@ -12,11 +12,14 @@ architecture bhv_tmp of temporary_register is
 begin
     process(input, enable,temp)
     begin
-        if enable = '1' then
+	 if enable = '1'  then
+        
             temp <= input;
-		  else
-		      temp <= temp;
-        end if;
+		 
+		else 
+			temp <= temp;
+		end if;
+		
 		  
     end process;
     output <= temp;

@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity Iins is
+entity ID is
     port(pr2_reset_synch,pr2_reset: in std_logic;
 			pr1_out : in std_logic_vector(15 downto 0); 
          pc_next : in std_logic_vector(15 downto 0);
@@ -11,12 +11,13 @@ entity Iins is
          clk : in std_logic;
 			
 			pc_pr1_LMSM_wr_en : out std_logic;
-         ID_out: out std_logic_vector(56 downto 0)); 
+         ID_out: out std_logic_vector(56 downto 0);
+			opcode_lm_sm:out std_logic_vector(3 downto 0));
 end entity;
 
 
 
-architecture behave of Iins is 
+architecture behave of ID is 
 
 component counter is
     Port ( clk : in  std_logic;
@@ -35,6 +36,7 @@ end component;
 
 component Decoder is
     port(pr1 : in std_logic_vector(15 downto 0); 
+			rf_write_lm : in std_logic;
          D_out: out std_logic_vector(39 downto 0);
 			ori_op : in std_logic_vector(3 downto 0)); 
 end component;
@@ -67,14 +69,16 @@ end component;
 
 signal dec_pr2: std_logic_vector(39 downto 0);  -- sign_ext control
 
-signal imm_sig,imm,imm_prev_for_lmsm,count_num: std_logic_vector (2 downto 0);
+signal imm,imm_prev_for_lmsm,count_num: std_logic_vector (2 downto 0);
+signal imm_sig : unsigned (2 downto 0):="000";
 signal opcode : std_logic_vector(3 downto 0);
 signal inst_updated : std_logic_vector (15 downto 0);
-signal counter_start_sig,one_or_zero,tf_flag,temp_en_sig : std_logic;
-
+signal counter_start_sig,one_or_zero,tf_flag,temp_en_sig,rf_wr_lm ,reset: std_logic;
+signal pr2_en_sig:std_logic;
     
 begin 
-		
+		opcode_lm_sm<=opcode;
+		pr2_en_sig<=pr2_en or(not(opcode(3)) and opcode(2) and opcode(1)) ;
 		opcode <= pr1_out(15 downto 12);
     inst_updating : process(pr1_out, count_num,imm,opcode)
 	 begin
@@ -99,27 +103,37 @@ begin
         end if;
 
     end process;
-    imm_proc  :process(count_num,imm_sig)
+	
+    imm_proc  :process(clk,pr1_out,imm_sig,reset,one_or_zero)
     begin
-        if count_num ="001" then
-            imm <= ("000");
-        else
-            imm <= imm_sig;
+	 if rising_edge(clk) then
+        if reset = '1' then
+           imm_sig <= ("000");
+        elsif (rf_wr_lm = '1' and (opcode = "0110" or opcode = "0111")) then
+           --imm <= imm_sig;
+			  imm_sig <= imm_sig + 1;
+			 else
+			 imm_sig<=imm_sig;
         end if; 
+		end if;
+		  imm <= std_logic_vector(imm_sig);
     end process;
     one_or_zero <= pr1_out(to_integer(unsigned(count_num)-1));
-    adder : adder_3bit
-        port map(imm_prev_for_lmsm,"000",one_or_zero,imm_sig);
+	 rf_wr_lm <= pr1_out(to_integer(unsigned(count_num)));
+    --adder : adder_3bit
+      --  port map(imm_prev_for_lmsm,"000",one_or_zero,imm_sig);
     
     ID_decoder: Decoder
-        port map(inst_updated,dec_pr2,opcode);
-		
+        port map(inst_updated,rf_wr_lm,dec_pr2,opcode);
+	reset <= count_num(0) and count_num(1) and count_num(2) ; 
 	reg_lmsm : imm_lmsm
-		port map(imm, clk, tf_flag, imm_prev_for_lmsm );
+		port map(imm, clk, reset, imm_prev_for_lmsm );
 
     pipeline_reg: pr2
-        port map(dec_pr2,pc_next,pr2_en,clk,temp_en_sig,ID_out, pr2_reset,pr2_reset_synch);
+        port map(dec_pr2,pc_next,pr2_en_sig,clk,temp_en_sig,ID_out, pr2_reset,pr2_reset_synch);
     countter : counter
             port map(clk,counter_reset,counter_start_sig,count_num,tf_flag,temp_en_sig);
-	pc_pr1_LMSM_wr_en <= not(counter_start_sig) or(count_num(0) and count_num(1) and count_num(2) );
+	--pc_pr1_LMSM_wr_en <= not(counter_start_sig) or(count_num(0) and count_num(1) and count_num(2) );
+	pc_pr1_LMSM_wr_en <= (not(counter_start_sig) and not(count_num(0) or count_num(1) or count_num(2) ))
+									or(count_num(0) and count_num(1) and count_num(2));
 end behave;
