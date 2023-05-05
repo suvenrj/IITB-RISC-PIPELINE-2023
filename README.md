@@ -216,6 +216,7 @@
      18. 39-36 **OPCODE**
      19. 55-40 **PC Next**
      20. 56 **Imm_reg_en** (for lmsm)
+     21. 57 **lmsm** (tells whether the cycle is a fake cycle generated from LM/SM or not)
 
 
   2. **OPCODE Decoder**

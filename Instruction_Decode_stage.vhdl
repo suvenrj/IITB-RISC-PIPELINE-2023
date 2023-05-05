@@ -131,7 +131,7 @@ begin
 		  imm <= std_logic_vector(imm_sig);
     end process;
     --one_or_zero <= pr1_out(to_integer(unsigned(count_num)-1));
-	 rf_wr_lm <= pr1_out(to_integer(unsigned(count_num)));
+	 rf_wr_lm <= pr1_out(to_integer(7-unsigned(count_num)));
     
     ID_decoder: Decoder
         port map(inst_updated,rf_wr_lm,dec_pr2,count_num,opcode);
