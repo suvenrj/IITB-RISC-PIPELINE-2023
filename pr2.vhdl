@@ -7,13 +7,14 @@ entity pr2 is
 		pr2_wr_en: in std_logic;
 		clk: in std_logic;
 		imm_reg_en:in std_logic;
-		pr2_out: out std_logic_vector(56 downto 0);
+		lmsm:in std_logic;
+		pr2_out: out std_logic_vector(57 downto 0);
 		reset_asynch,reset_synch: in std_logic); 
 end entity;
 
 architecture behave of pr2 is 
 
-signal reg_sig : std_logic_vector(56 downto 0):=(others => '0');  -- sign_ext control
+signal reg_sig : std_logic_vector(57 downto 0):=(others => '0');  -- sign_ext control
 
     
 begin 
@@ -26,6 +27,7 @@ process (clk, reset_synch,reset_asynch,reg_sig)
 					reg_sig(39 downto 0) <= decoder_out;
 					reg_sig(55 downto 40) <= pc_next;
 					reg_sig(56)<= imm_reg_en;
+					reg_sig(57)<= lmsm;
 				else 
 					reg_sig <= reg_sig;
 				end if;

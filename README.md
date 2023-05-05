@@ -216,6 +216,8 @@
      18. 39-36 **OPCODE**
      19. 55-40 **PC Next**
      20. 56 **Imm_reg_en** (for lmsm)
+
+
   2. **OPCODE Decoder**
      1. **T1 T0**
      -  0  0 -**R Type**
@@ -237,7 +239,7 @@
      2. M8
         - OPCODE(ABCD)
          - CZ FLAG(EF)
-         - C0
+         - C0u
          - 0  - **RA**
          - 1  - **PC-6**
          - C0= ABD' + AC'D'F + AB'EF + AB'DE + AB'CF'

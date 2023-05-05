@@ -5,6 +5,7 @@ entity Decoder is
     port(pr1 : in std_logic_vector(15 downto 0);
 			rf_write_lm : in std_logic;
          D_out: out std_logic_vector(39 downto 0);
+			count: in std_logic_vector(2 downto 0);
 			ori_op : in std_logic_vector(3 downto 0)); --original opcode
 end entity;
 
@@ -69,7 +70,8 @@ begin
 	D_out(27) <=  Z;				--M1_C0
 	D_out(28) <= (B1) and (A1) and (C or D) and (Cy or Z) and (Cy1 or Z1) and (C1 or D1);		-- M1_C1
 	D_out(29) <= ((A1 and B) or (C and D) or (A1 and C1 and D1));									-- M2
-	D_out(30) <= A1 and pr1(8);				--M4-C0  -- pr(8) 9th bit in inst; MSB in IMM9
+	D_out(30) <= (((A1 and pr1(8)) and (not((A1 and B) or (C and D) or (A1 and C1 and D1))))   or (not(ori_op(3)) and ori_op(2) and ori_op(1)))
+						and ((count(0)or count(1)or count(2))  or (not(not(ori_op(3)) and ori_op(2) and ori_op(1))));				--M4-C0  -- pr(8) 9th bit in inst; MSB in IMM9
 	D_out(31) <= (D1) or (A1 and C1) or (A and B1) or (B and C);				--M4-C1
 	D_out(32) <= A;						-- M5-C0
 	D_out(33) <= B; 						--M5-C1

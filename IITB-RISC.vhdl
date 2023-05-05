@@ -23,14 +23,14 @@ component ID is
          clk : in std_logic;
 			
 			pc_pr1_LMSM_wr_en : out std_logic;
-         ID_out: out std_logic_vector(56 downto 0);
+         ID_out: out std_logic_vector(57 downto 0);
 			opcode_lm_sm:out std_logic_vector(3 downto 0)); 
 end component;
 
 component operand_read is
     port(pr3_reset_synch: in std_logic;
 	    pr3_reset_asynch: in std_logic;
-	    pr2_out: in std_logic_vector(56 downto 0);
+	    pr2_out: in std_logic_vector(57 downto 0);
          dest_add: in std_logic_vector(2 downto 0);
          dest_data: in std_logic_vector(15 downto 0);
          rf_wr_en: in std_logic;
@@ -84,7 +84,7 @@ component load_hazard_detector is
 end component;
 
 signal if_id:std_logic_vector(15 downto 0);
-signal id_or:std_logic_vector(56 downto 0);
+signal id_or:std_logic_vector(57 downto 0);
 signal or_exec:std_logic_vector(99 downto 0);
 signal exec_macc:std_logic_vector(54 downto 0);
 signal macc_wb:std_logic_vector(19 downto 0);
