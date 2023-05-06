@@ -52,7 +52,7 @@ architecture behave of load_hazard_detector is
                     hazard<='0';
                 end if;
 
-            elsif ((opcode_exec = "0100" or opcode_exec = "0011") and opcode_rr = "1111") then
+            elsif ((opcode_exec = "0100" or opcode_exec = "0011") and (opcode_rr = "1111" or opcode_rr ="0000")) then
                 if (reg_a = load_dest) then
                     hazard<='1';
                 else

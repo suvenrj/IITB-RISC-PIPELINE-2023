@@ -95,6 +95,7 @@ end component temporary_register;
 
 signal D1,D2,imm_out,M2_out,M4_out: std_logic_vector(15 downto 0);
 signal tr_op:std_logic_vector(15 downto 0);
+signal d2_updated :std_logic_vector(15 downto 0);
 begin 
     reg_a_adr <= pr2_out(14 downto 12);
     reg_b_adr <= pr2_out(17 downto 15);
@@ -113,7 +114,7 @@ begin
     port map(D2,IMM_out,pr2_out(29),m2_out);
 
     pr3_reg: pr3
-    port map(m15_out,m16_out,Imm_out,pr2_out(55 downto 40),D2,pr2_out(11 downto 9),pr2_out(25 downto 23),pr2_out(20),pr2_out(21),pr2_out(33 downto 32),pr2_out(34),pr2_out(28 downto 27),pr2_out(35),pr2_out(39 downto 36),pr2_out(18),pr2_out(19),pr3_wr_en,clk,pr3_reset_asynch,pr3_reset_synch,or_out);
+    port map(m15_out,m16_out,Imm_out,pr2_out(55 downto 40),d2_updated,pr2_out(11 downto 9),pr2_out(25 downto 23),pr2_out(20),pr2_out(21),pr2_out(33 downto 32),pr2_out(34),pr2_out(28 downto 27),pr2_out(35),pr2_out(39 downto 36),pr2_out(18),pr2_out(19),pr3_wr_en,clk,pr3_reset_asynch,pr3_reset_synch,or_out);
 	 
 	 tr :temporary_register
 	 port map(m15_out,pr2_out(56),clk,tr_op);
@@ -121,9 +122,9 @@ begin
     p1_m15:process(op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,m4_out,dest_data,dest_add,rf_wr_ex_en,rf_wr_ma_en,rf_wr_en)
     begin
         if (op = "0001" or op = "0000" or op = "0010" or op = "1111" or op = "1000" or op = "1001" or op = "1010" or op = "0100" or op = "0101") and (pr2_out(57) = '0')  then
-            if pr2_out(14 downto 12)  = ex_dest and rf_wr_ex_en = '1'  then
+            if (pr2_out(14 downto 12)  = ex_dest and rf_wr_ex_en = '1')    then
                 m15_out<= ex_data;
-            elsif pr2_out(14 downto 12) = macc_dest  and rf_wr_ma_en = '1' then
+            elsif (pr2_out(14 downto 12) = macc_dest  and rf_wr_ma_en = '1') then
                 m15_out<=macc_data;
             elsif pr2_out(14 downto 12) = dest_add and rf_wr_en = '1' then
                 m15_out<=dest_data;
@@ -137,7 +138,7 @@ begin
 
     p1_m16:process(op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,m2_out,dest_data,dest_add,rf_wr_ex_en,rf_wr_ma_en,rf_wr_en)
     begin
-        if  op = "1000" or op = "1001" or op = "1010" or op = "1101" then
+        if  op = "1000" or op = "1001" or op = "1010" or op = "1101"  then
             if pr2_out(17 downto 15) = ex_dest and rf_wr_ex_en = '1' then
                 m16_out<= ex_data;
             elsif pr2_out(17 downto 15) = macc_dest  and rf_wr_ma_en = '1' then
@@ -151,5 +152,24 @@ begin
             m16_out<=m2_out;
         end if;
     end process ;
+	 
+	 p1_M19:process (op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,dest_data,dest_add,rf_wr_ex_en,rf_wr_ma_en,rf_wr_en,D2,D2_updated)
+	 begin
+		if op="0101" then
+		if pr2_out(17 downto 15) = ex_dest and rf_wr_ex_en = '1' then
+                d2_updated<= ex_data;
+            elsif pr2_out(17 downto 15) = macc_dest  and rf_wr_ma_en = '1' then
+                d2_updated<=macc_data;
+            elsif pr2_out(17 downto 15) = dest_add  and rf_wr_en = '1'then
+                d2_updated<=dest_data;
+            else 
+                d2_updated<=D2;
+            end if;
+        else
+            d2_updated<=D2;
+        end if;
+		  
+		end process;
+			
 
 end architecture;
