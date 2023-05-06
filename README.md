@@ -100,6 +100,8 @@
      - 0  0 - Cosnt(00)
      - 0  1 - Cosnt(01)
      - 1  0 - D1
+     - 1  1 - Temporary Rgister (for storing origianl base address in LM/SM)
+        These are for case without LM/SM, please refer to `Instruction_Decode_stage.vhdl` for complete control.
      - C1=D' + A'C' + AB' + BC
      - C0=A'E
   5. M5
@@ -672,7 +674,13 @@ The alu give out CZ flags it depends on OPCODE if it gets stored or not so alway
      - $\text{PR}_4 (\text{ALU}_1 \text{C}) \rightarrow \text{Memory}_\text{Address}$
      - $\text{PR}_4 (\text{D1}) \rightarrow \text{Memory}_\text{DI}$
    - **Write back**
+19. ### **LM**
+      The instruction is broken into 8 load instructions and is called **updated instruction**,  which happens in the decode stage. Also the `Register File Write Enable` is equivalent to the corredponding mask bit in the original instruction.
 
+      With this done rest remain same as load instruction. With addition that the value of base register is fetched from a temporary register (in operand read stage) for the next 7 fake cycles instead of register file.
+
+22. ### **SM**
+      The ideology remains the same as LM and instruction is changed equivalently. Now `Data Memory Write Enable` will depend on corresponding mask bit.
 21. ### **BEQ** 
   **Turn off ALL** Write Signals(RF,Memory,CZ FLAGS).
   - **Register read**
