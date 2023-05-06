@@ -17,7 +17,8 @@ entity operand_read is
 			
 	    reg_a_adr, reg_b_adr: out std_logic_vector(2 downto 0);
          or_out:out std_logic_vector(99 downto 0);
-         opcode_for_lhd:out std_logic_vector(3 downto 0));
+         opcode_for_lhd:out std_logic_vector(3 downto 0);
+			rr_lmsm : out std_logic);
 end entity;
 
 architecture behave_or of operand_read is 
@@ -96,7 +97,11 @@ end component temporary_register;
 signal D1,D2,imm_out,M2_out,M4_out: std_logic_vector(15 downto 0);
 signal tr_op:std_logic_vector(15 downto 0);
 signal d2_updated :std_logic_vector(15 downto 0);
+signal m4_cont : std_logic_vector (1 downto 0);
+signal rr_lmsm_sig : std_logic;
 begin 
+	rr_lmsm <= pr2_out(57);
+rr_lmsm_sig <= not(pr2_out(57));
     reg_a_adr <= pr2_out(14 downto 12);
     reg_b_adr <= pr2_out(17 downto 15);
     op <= pr2_out(39 downto 36);
@@ -106,9 +111,10 @@ begin
 
     si_ext: sign_ext
     port map(pr2_out(5 downto 0),pr2_out(8 downto 0),pr2_out(26),IMM_out);
-
+	m4_cont(1) <= pr2_out(31);
+	m4_cont(0) <= (not m4_cont(1) and pr2_out(30)) or (m4_cont(1) and pr2_out(57));
     m4: mux4x1_16
-    port map("0000000000000000","0000001000000000",D1,tr_op,pr2_out(31 downto 30),M4_out);
+    port map("0000000000000000","0000001000000000",D1,tr_op,m4_cont,M4_out);
 
     m2: mux2x1_16bit
     port map(D2,IMM_out,pr2_out(29),m2_out);
@@ -117,7 +123,7 @@ begin
     port map(m15_out,m16_out,Imm_out,pr2_out(55 downto 40),d2_updated,pr2_out(11 downto 9),pr2_out(25 downto 23),pr2_out(20),pr2_out(21),pr2_out(33 downto 32),pr2_out(34),pr2_out(28 downto 27),pr2_out(35),pr2_out(39 downto 36),pr2_out(18),pr2_out(19),pr3_wr_en,clk,pr3_reset_asynch,pr3_reset_synch,or_out);
 	 
 	 tr :temporary_register
-	 port map(m15_out,pr2_out(56),clk,tr_op);
+	 port map(m15_out, rr_lmsm_sig,clk,tr_op);
 	 
     p1_m15:process(op,pr2_out,ex_data,macc_data,ex_dest,macc_dest,m4_out,dest_data,dest_add,rf_wr_ex_en,rf_wr_ma_en,rf_wr_en)
     begin

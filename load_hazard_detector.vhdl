@@ -4,8 +4,8 @@ use ieee.std_logic_1164.all;
 entity load_hazard_detector is
     port (load_dest, reg_a, reg_b: in std_logic_vector(2 downto 0); 
         opcode_exec, opcode_rr,opcode_lm_sm: in std_logic_vector(3 downto 0);
-        clk:in std_logic;
-			pr3_synch_reset_lhd,pc_en, pr1_en, pr2_en: out std_logic
+        clk,rr_lmsm:in std_logic;
+			pr3_synch_reset_lhd,pc_en, pr1_en, pr2_en,counter_en: out std_logic
         );
 end entity;
 
@@ -13,7 +13,7 @@ architecture behave of load_hazard_detector is
     signal hazard, prev_hazard : std_logic := '0';
     begin 
 			
-		pr3_synch_reset_lhd <= (hazard and not(prev_hazard))and not (not (opcode_lm_sm(3)) and opcode_lm_sm(2) and (opcode_lm_sm(1)));
+		pr3_synch_reset_lhd <= (hazard and not(prev_hazard))and not(rr_lmsm);
         p1: process (clk,prev_hazard,hazard)
         begin
             if rising_edge(clk) then
@@ -29,10 +29,12 @@ architecture behave of load_hazard_detector is
                 pc_en <='0';
                 pr1_en <='0';
                 pr2_en <='0';
+					 counter_en <= '0';
             else
                 pc_en <='1';
                 pr1_en <='1';
                 pr2_en <='1';
+					 counter_en <= '1';
             end if;
         end process;
         

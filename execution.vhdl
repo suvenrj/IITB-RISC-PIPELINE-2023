@@ -14,7 +14,8 @@ entity execution is
     rf_wr_ex_en:out std_logic;
     cy_frm_ma,z_frm_ma:in std_logic;
     
-    cy_frm_wb,z_frm_wb:in std_logic);
+    cy_frm_wb,z_frm_wb:in std_logic;
+	 cy_data,z_data:out std_logic);
 end entity ;
 
 -- data 1 and data 2 are for ALU but data_imm is needed for beq instr
@@ -107,6 +108,8 @@ architecture bhv_exec of execution is
     signal pr4_outt: std_logic_vector(56 downto 0);
     signal cy_to_ma,z_to_ma:std_logic;
     begin
+	 cy_data<=cy_old;
+	 z_data<=z_old;
 	opcode <= pr3(67 downto 64);
     rf_wr_ex_en<=m1_out;
         cp1: complimenter

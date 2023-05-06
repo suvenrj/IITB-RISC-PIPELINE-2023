@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 
 entity Decoder is
     port(pr1 : in std_logic_vector(15 downto 0);
-			rf_write_lm : in std_logic;
+
          D_out: out std_logic_vector(39 downto 0);
 			count: in std_logic_vector(2 downto 0);
 			ori_op : in std_logic_vector(3 downto 0)); --original opcode
@@ -57,8 +57,8 @@ begin
 	D_out(39 downto 36) <= pr1(15 downto 12);		--Storing OPCODE
 	D_out(11 downto 9) <= pr1(11 downto 9);			--Stroing Destination address
 	--D_out()<= pr1()
-	D_out(18) <= ((A1 and  B1) or (A1 and  D1) or (A and  C1 and B))  and (rf_write_lm or (not(not(ori_op(3)) and ori_op(2) and ori_op(1)))); --Register File write enable
-	D_out(19) <= (A1 and  B and D) and (rf_write_lm or (not(not(ori_op(3)) and ori_op(2) and ori_op(1))))  ; 				--Data Memory write enable
+	D_out(18) <= ((A1 and  B1) or (A1 and  D1) or (A and  C1 and B)); --Register File write enable
+	D_out(19) <= (A1 and  B and D)  ; 				--Data Memory write enable
 	D_out(20) <= (A1 and B1 and C1); 				-- C flag Write enable
 	D_out(21) <= (not(not(ori_op(0))and(ori_op(1)) and(ori_op(2)) and not(ori_op(3))))
 						and ((A1 and B1 and C1) or (A1 and B1 and D1) or (A1 and C1 and D1));		-- Z flag enable

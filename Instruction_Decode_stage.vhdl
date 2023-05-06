@@ -8,8 +8,9 @@ entity ID is
          pc_next : in std_logic_vector(15 downto 0);
          pr2_en: in std_logic;
 			counter_reset : in std_logic;
+			counter_en : in std_logic;
          clk : in std_logic;
-			
+
 			pc_pr1_LMSM_wr_en : out std_logic;
          ID_out: out std_logic_vector(57 downto 0);
 			opcode_lm_sm:out std_logic_vector(3 downto 0));
@@ -22,8 +23,10 @@ architecture behave of ID is
 component counter is
     Port ( clk : in  std_logic;
            reset : in  std_logic;
+			  en : in std_logic;
            start : in  std_logic;
            count : out std_logic_vector(2 downto 0);
+			    max_count : in integer range 0 to 8;
            --tf : out std_logic;
 			  temp_en : out std_logic);
 end component;
@@ -36,7 +39,7 @@ end component;
 
 component Decoder is
     port(pr1 : in std_logic_vector(15 downto 0); 
-			rf_write_lm : in std_logic;
+
          D_out: out std_logic_vector(39 downto 0);
 			count: in std_logic_vector(2 downto 0);
 			ori_op : in std_logic_vector(3 downto 0)); 
@@ -75,74 +78,176 @@ signal imm,imm_prev_for_lmsm,count_num: std_logic_vector (2 downto 0);
 signal imm_sig : unsigned (2 downto 0):="000";
 signal opcode : std_logic_vector(3 downto 0);
 signal inst_updated : std_logic_vector (15 downto 0);
-signal counter_start_sig,temp_en_sig,rf_wr_lm ,reset,lmsm: std_logic;
+signal counter_start_sig,temp_en_sig,rf_wr_lm ,reset,lmsm_sig: std_logic;
 signal pr2_en_sig:std_logic;
     
+--------------------------------------------------------------------------------------------	 
+ type addr is array(0 to 7) of std_logic_vector(2 downto 0);
+signal no_of_ones : integer range 0 to 8;
+signal addresses : addr :=   (others=>(others=>'0'));
+signal max_count : std_logic_vector(2 downto 0)  := (others =>'0');
+signal inputByte : std_logic_vector(7 downto 0) := (others =>'0');
+--------------------------------------------------------------------------------------------
+	 
 begin 
-		opcode_lm_sm<=opcode;
-		pr2_en_sig<=pr2_en or(not(opcode(3)) and opcode(2) and opcode(1)) ;
+
+--------------------------------------------------------------------------------------------
+ inputByte <= pr1_out(7 downto 0);
+	analyse:process(inputByte,opcode)
+        variable count : integer range 0 to 8 := 0;
+        variable tempPositions : addr := (others=>(others => '0'));
+    begin
+			count := 0;
+			tempPositions := (others =>(others => '0'));
+			if((opcode = "0110" or opcode = "0111")) then
+					for i in 0 to 7 loop
+				       if inputByte(7-i) = '1' then
+                            tempPositions(count) := std_logic_vector(to_unsigned(i,3));
+									count := count + 1;
+						 end if;
+					end loop;
+			end if;
+        no_of_ones <= count;
+        addresses <= tempPositions;
+
+				
+    end process;
+
+	
+countter : counter
+            port map(clk,counter_reset, counter_en ,counter_start_sig,count_num,no_of_ones,temp_en_sig);
+				
+		max_count <= std_logic_vector(to_unsigned(no_of_ones-1,3));
 		opcode <= pr1_out(15 downto 12);
-    inst_updating : process(pr1_out, count_num,imm,opcode)
+		opcode_lm_sm<=opcode;
+		pr2_en_sig<=pr2_en  ;
+		
+    inst_updating : process(pr1_out, count_num,imm,opcode,addresses,lmsm_sig)
 	 begin
         if opcode = "0110" then
             counter_start_sig <= '1';
             inst_updated (15 downto 12) <= ("0100");
-            inst_updated (11 downto 9) <= std_logic_vector(unsigned(count_num));
+            inst_updated (11 downto 9) <= addresses(to_integer(unsigned(count_num)));
             inst_updated (8 downto 6) <= pr1_out(11 downto 9);
             inst_updated (5 downto 3) <= "000";
-            inst_updated (2 downto 0) <= imm;
+            inst_updated (2 downto 0) <= count_num;
 				if count_num = "000" then
-					lmsm <= '0';
+					lmsm_sig <= '0';
 				else 
-					lmsm<= '1';
+					lmsm_sig<= '1';
 				end if;
         elsif opcode = "0111" then
             counter_start_sig <= '1';
             inst_updated (15 downto 12) <= "0101";
-            inst_updated (11 downto 9) <= count_num;
+            inst_updated (11 downto 9) <= addresses(to_integer(unsigned(count_num)));
             inst_updated (8 downto 6) <= pr1_out(11 downto 9);
             inst_updated (5 downto 3) <= "000";
-            inst_updated (2 downto 0) <= imm;
+            inst_updated (2 downto 0) <= count_num;
 				if count_num = "000" then
-					lmsm <= '0';
+					lmsm_sig <= '0';
 				else 
-					lmsm<= '1';
+					lmsm_sig<= '1';
 				end if;
         else
         counter_start_sig <= '0';
         inst_updated <= pr1_out; 
-		  lmsm <= '0';
+		  lmsm_sig <= '0';
         end if;
 
     end process;
 	
-    imm_proc  :process(clk,pr1_out,imm_sig,reset)
-    begin
-	 if rising_edge(clk) then
-        if reset = '1' then
-           imm_sig <= ("000");
-        elsif (rf_wr_lm = '1' and (opcode = "0110" or opcode = "0111")) then
-           --imm <= imm_sig;
-			  imm_sig <= imm_sig + 1;
-			 else
-			 imm_sig<=imm_sig;
-        end if; 
-		end if;
-		  imm <= std_logic_vector(imm_sig);
-    end process;
-    --one_or_zero <= pr1_out(to_integer(unsigned(count_num)-1));
-	 rf_wr_lm <= pr1_out(to_integer(7-unsigned(count_num)));
-    
-    ID_decoder: Decoder
-        port map(inst_updated,rf_wr_lm,dec_pr2,count_num,opcode);
-	reset <= count_num(0) and count_num(1) and count_num(2) ; 
-	--reg_lmsm : imm_lmsm
-		--port map(imm, clk, reset, imm_prev_for_lmsm );
+
+
+ID_decoder: Decoder
+        port map(inst_updated,dec_pr2,count_num,opcode);
+	
 
     pipeline_reg: pr2
-        port map(dec_pr2,pc_next,pr2_en_sig,clk,temp_en_sig,lmsm,ID_out, pr2_reset,pr2_reset_synch);
-    countter : counter
-            port map(clk,counter_reset,counter_start_sig,count_num,temp_en_sig);
-	pc_pr1_LMSM_wr_en <= (not(counter_start_sig) and not(count_num(0) or count_num(1) or count_num(2) ))
-									or(count_num(0) and count_num(1) and count_num(2));
+        port map(dec_pr2,pc_next,pr2_en_sig,clk,temp_en_sig,lmsm_sig,ID_out, pr2_reset,pr2_reset_synch);
+
+
+	pc_pr1_en : process (counter_start_sig,count_num,max_count)
+	begin
+		if((counter_start_sig ='0' and count_num = "000") or (count_num = max_count) ) then
+			pc_pr1_LMSM_wr_en <= '1';
+		else
+			pc_pr1_LMSM_wr_en<='0';
+		end if;
+	end process;
+	
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------
+--		opcode_lm_sm<=opcode;
+--		pr2_en_sig<=pr2_en or(not(opcode(3)) and opcode(2) and opcode(1)) ;
+--		opcode <= pr1_out(15 downto 12);
+--    inst_updating : process(pr1_out, count_num,imm,opcode)
+--	 begin
+--        if opcode = "0110" then
+--            counter_start_sig <= '1';
+--            inst_updated (15 downto 12) <= ("0100");
+--            inst_updated (11 downto 9) <= std_logic_vector(unsigned(count_num));
+--            inst_updated (8 downto 6) <= pr1_out(11 downto 9);
+--            inst_updated (5 downto 3) <= "000";
+--            inst_updated (2 downto 0) <= imm;
+--				if count_num = "000" then
+--					lmsm <= '0';
+--				else 
+--					lmsm<= '1';
+--				end if;
+--        elsif opcode = "0111" then
+--            counter_start_sig <= '1';
+--            inst_updated (15 downto 12) <= "0101";
+--            inst_updated (11 downto 9) <= count_num;
+--            inst_updated (8 downto 6) <= pr1_out(11 downto 9);
+--            inst_updated (5 downto 3) <= "000";
+--            inst_updated (2 downto 0) <= imm;
+--				if count_num = "000" then
+--					lmsm <= '0';
+--				else 
+--					lmsm<= '1';
+--				end if;
+--        else
+--        counter_start_sig <= '0';
+--        inst_updated <= pr1_out; 
+--		  lmsm <= '0';
+--        end if;
+--
+--    end process;
+--	
+--    imm_proc  :process(clk,pr1_out,imm_sig,reset)
+--    begin
+--	 if rising_edge(clk) then
+--        if reset = '1' then
+--           imm_sig <= ("000");
+--        elsif (rf_wr_lm = '1' and (opcode = "0110" or opcode = "0111")) then
+--           --imm <= imm_sig;
+--			  imm_sig <= imm_sig + 1;
+--			 else
+--			 imm_sig<=imm_sig;
+--        end if; 
+--		end if;
+--		  imm <= std_logic_vector(imm_sig);
+--    end process;
+--    --one_or_zero <= pr1_out(to_integer(unsigned(count_num)-1));
+--	 rf_wr_lm <= pr1_out(to_integer(7-unsigned(count_num)));
+--    
+--    ID_decoder: Decoder
+--        port map(inst_updated,rf_wr_lm,dec_pr2,count_num,opcode);
+--	reset <= count_num(0) and count_num(1) and count_num(2) ; 
+--	--reg_lmsm : imm_lmsm
+--		--port map(imm, clk, reset, imm_prev_for_lmsm );
+--
+--    pipeline_reg: pr2
+--        port map(dec_pr2,pc_next,pr2_en_sig,clk,temp_en_sig,lmsm,ID_out, pr2_reset,pr2_reset_synch);
+--    countter : counter
+--            port map(clk,counter_reset,counter_start_sig,count_num,temp_en_sig);
+--	pc_pr1_LMSM_wr_en <= (not(counter_start_sig) and not(count_num(0) or count_num(1) or count_num(2) ))
+--									or(count_num(0) and count_num(1) and count_num(2));
 end behave;

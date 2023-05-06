@@ -5,8 +5,10 @@ use ieee.numeric_std.all;
 entity counter is
     Port ( clk : in  std_logic;
            reset : in  std_logic;
+			  en : in std_logic;
            start : in  std_logic;
            count : out std_logic_vector(2 downto 0);
+			  max_count : in integer range 0 to 8;
            --tf : out std_logic;   -- not need till now so disabled; undo all tf comments to enable it
 			  temp_en : out std_logic);
 end entity;
@@ -17,19 +19,19 @@ architecture archi of counter is
 	 signal count_sig : std_logic_vector(2 downto 0);
     signal started : std_logic := '0';
 begin
-    process (clk, reset)
+    process (clk, reset,en)
     begin
         if (reset = '1') then
             temp_count <= "000";
             --temp_tf <= '1';
             started <= '0';
-        elsif (rising_edge(clk)) then
+        elsif (rising_edge(clk) and en = '1') then
             if (start = '1' and started = '0') then
                 temp_count <= ("001");
                 --temp_tf <= '0';
                 started <= '1';
             elsif (started = '1') then
-                if (temp_count = 7) then
+                if (temp_count = max_count-1) then
                     temp_count <= ("000");
                     --temp_tf <= '1';
                     started <= '0';
