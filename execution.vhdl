@@ -125,7 +125,7 @@ architecture bhv_exec of execution is
         port map(pr3(31 downto 16),m6_out,cy_frm_ma,pr3(57 downto 55),Alu_out,cy_frm_alu,z_frm_alu);
 
         m1: mux4x1_1bit
-        port Map(pr3(51),pr3(51),cy_old,z_old,pr3(59 downto 58),m1_out);
+        port Map(pr3(51),pr3(51),cy_frm_ma,z_frm_ma,pr3(59 downto 58),m1_out);
 
         pr4_reg: pr4
         port map(ALU_out,m1_out,pr4_en,pr3(50 downto 48),pr3(52),pr3(61 downto 60),pr3(83 downto 68),pr3(99 downto 84),clk,pr4_reset,cy_to_ma,z_to_ma,pr4_outt);
@@ -137,10 +137,10 @@ architecture bhv_exec of execution is
         port map(pr3(67 downto 64),cy_frm_alu,z_frm_alu,branch_haz);
 
         m17: mux2x1_1bit
-        port map(cy_old,cy_frm_ma,pr3(53),cy_to_ma);
+        port map(cy_frm_ma,cy_frm_alu,pr3(53),cy_to_ma);
 
         m18: mux2x1_1bit
-        port map(z_old,z_frm_ma,pr3(54),z_to_ma);
+        port map(z_frm_ma,z_frm_alu,pr3(54),z_to_ma);
 
         REGA_data<=pr3(31 downto 16);
         --REGB_data<=pr3(47 downto 32);
