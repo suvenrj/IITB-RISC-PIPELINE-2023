@@ -49,29 +49,33 @@ component execution is
 	port(pr4_reset,clk: in std_logic;
     pr3: in std_logic_vector(99 downto 0);
     pr4_en: in std_logic;
-    ex_out:out std_logic_vector(54 downto 0);
+    ex_out:out std_logic_vector(56 downto 0);
     REGA_data: out std_logic_vector(15 downto 0); decoder2_out:out std_logic_vector(2 downto 0);
     se_out,ALU_C_out:out  std_logic_vector(15 downto 0);M14_Control:out std_logic;
     ex_dest: out std_logic_vector(2 downto 0);
 	opcode: out std_logic_vector(3 downto 0);
     branch_haz: out std_logic;
-    rf_wr_ex_en:out std_logic);
+    rf_wr_ex_en:out std_logic;
+    cy_frm_ma,z_frm_ma:in std_logic;
+    
+    cy_frm_wb,z_frm_wb:in std_logic);
 end component;
 
 component memoryaccess is 
-    port (pr5_reset, clk: in std_logic;pr4:std_logic_vector(54 downto 0);
-    pr5_en: in std_logic;mem_stage_out: out std_logic_vector(19 downto 0);
+    port (pr5_reset, clk: in std_logic;pr4:in std_logic_vector(56 downto 0);
+    pr5_en: in std_logic;mem_stage_out: out std_logic_vector(21 downto 0);
     macc_data:out std_logic_vector(15 downto 0);
     macc_dest:out std_logic_vector(2 downto 0);
-    rf_wr_ma_en:out std_logic);
+    rf_wr_ma_en,cy_to_exec,z_to_exec:out std_logic);
 end component;
 
 component write_back is
     port( 
     reg_write_en_out: out std_logic;
     data_out: out std_logic_vector(15 downto 0); 
-    dest_reg_out: out std_logic_vector(2 downto 0); 
-    pr5_out : in std_logic_vector(19 downto 0)
+    dest_reg_out: out std_logic_vector(2 downto 0);
+    cy_for_exec, z_for_exec:out std_logic;
+    pr5_out : in std_logic_vector(21 downto 0)
 );
 end component;
 
@@ -86,8 +90,8 @@ end component;
 signal if_id:std_logic_vector(15 downto 0);
 signal id_or:std_logic_vector(57 downto 0);
 signal or_exec:std_logic_vector(99 downto 0);
-signal exec_macc:std_logic_vector(54 downto 0);
-signal macc_wb:std_logic_vector(19 downto 0);
+signal exec_macc:std_logic_vector(56 downto 0);
+signal macc_wb:std_logic_vector(21 downto 0);
 signal s_alu_exec, s_imm_exec, s_pc_next, S_rega_exec , s_df_wb, s_df_ma, junk: std_logic_vector(15 downto 0);
 signal s_df_adr_exec, s_df_adr_ma, s_df_adr_wb, s_decoder_2, s_reg_a_or, s_reg_b_or:std_logic_vector(2 downto 0);
 signal s_opcode_exec,s_opcode_rr:std_logic_vector(3 downto 0);
@@ -96,6 +100,7 @@ signal s_rf_wr_en,pr1_en,Pr2_en,Pr3_en,Pr4_en,Pr5_en,s_pc_en,s_m14_control, s_pr
 signal s_rf_wr_ex_en,s_rf_wr_ma_en :std_logic;
 signal PC_pr1_en_lmsm,pr1_en_sig,pc_en_sig,pr1_en_lh,counnter_reset:std_logic;
 signal opcode_ori:std_logic_vector(3 downto 0);
+signal cy_forward,z_forward,cy_wb,z_wb:std_logic;
 begin
 	 dummy <=s_df_wb;
 	 pr1_en_sig<=PC_pr1_en_lmsm and pr1_en_lh;
@@ -124,13 +129,13 @@ begin
 
     exec: execution
     port map(s_pr4_reset, clk,or_exec,pr4_en,exec_macc, s_rega_exec, s_decoder_2,s_imm_exec,s_alu_exec,s_m14_control,
-			s_df_adr_exec, s_opcode_exec,b_haz,s_rf_wr_ex_en);
+			s_df_adr_exec, s_opcode_exec,b_haz,s_rf_wr_ex_en,cy_forward,z_forward,cy_wb,z_wb);
 
     memacc: memoryaccess
-    port map(s_pr5_reset, clk,exec_macc, pr5_en, macc_wb, s_df_ma, s_df_adr_ma,s_rf_wr_ma_en);
+    port map(s_pr5_reset, clk,exec_macc, pr5_en, macc_wb, s_df_ma, s_df_adr_ma,s_rf_wr_ma_en,cy_forward,z_forward);
 
     wb: write_back
-    port map(s_rf_wr_en, s_df_wb, s_df_adr_wb, macc_wb);
+    port map(s_rf_wr_en, s_df_wb, s_df_adr_wb,cy_wb ,z_wb,macc_wb);
 
     load_haz : load_hazard_detector
     port map(s_df_adr_exec, s_reg_a_or, s_reg_b_or, s_opcode_exec,s_opcode_rr,opcode_ori,clk, s_pr3_synch_reset_lhd, s_pc_en, pr1_en_lh, pr2_en );

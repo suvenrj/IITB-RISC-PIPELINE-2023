@@ -5,13 +5,16 @@ entity execution is
 	port(pr4_reset,clk: in std_logic;
     pr3: in std_logic_vector(99 downto 0);
     pr4_en: in std_logic;
-    ex_out:out std_logic_vector(54 downto 0);
+    ex_out:out std_logic_vector(56 downto 0);
     REGA_data: out std_logic_vector(15 downto 0); decoder2_out:out std_logic_vector(2 downto 0);
     se_out,ALU_C_out:out  std_logic_vector(15 downto 0);M14_Control:out std_logic;
     ex_dest: out std_logic_vector(2 downto 0);
 	opcode: out std_logic_vector(3 downto 0);
     branch_haz: out std_logic;
-    rf_wr_ex_en:out std_logic);
+    rf_wr_ex_en:out std_logic;
+    cy_frm_ma,z_frm_ma:in std_logic;
+    
+    cy_frm_wb,z_frm_wb:in std_logic);
 end entity ;
 
 -- data 1 and data 2 are for ALU but data_imm is needed for beq instr
@@ -76,7 +79,8 @@ architecture bhv_exec of execution is
                 Ra_value:in std_logic_vector(15 downto 0);
                 clk: in std_logic;
             	reset: in std_logic;
-                pr4_out: out std_logic_vector(54 downto 0)); 
+                cy_to_ma,z_to_ma: in std_logic;
+                pr4_out: out std_logic_vector(56 downto 0)); 
     end component;
 
     component Decoder2 is
@@ -91,9 +95,17 @@ architecture bhv_exec of execution is
              branch_haz: out std_logic);
     end component;
 
+    component mux2x1_1bit is
+        port(I0: in std_logic;
+             I1: in std_logic;
+             S0: in std_logic;
+            I_out:out std_logic);
+    end component;
+
     signal cy_frm_alu,cy_old,z_frm_alu,z_old,m1_out,M7_control,M8_control,M9_control:std_logic;
     signal comp_out,m6_out,alu_out:std_logic_vector(15 downto 0);
-    signal pr4_outt: std_logic_vector(54 downto 0);
+    signal pr4_outt: std_logic_vector(56 downto 0);
+    signal cy_to_ma,z_to_ma:std_logic;
     begin
 	opcode <= pr3(67 downto 64);
     rf_wr_ex_en<=m1_out;
@@ -104,25 +116,31 @@ architecture bhv_exec of execution is
         port map(pr3(47 downto 32),comp_out,pr3(62),m6_out);
 
         c_flag: carry_flag
-        port map(clk,pr3(53),Cy_frm_alu,cy_old);
+        port map(clk,'1',Cy_frm_wb,cy_old);
 
         z_flag: zero_flag
-        port map(clk,pr3(54),z_frm_alu,z_old);
+        port map(clk,'1',z_frm_wb,z_old);
 
         alu: basic_ALU
-        port map(pr3(31 downto 16),m6_out,cy_old,pr3(57 downto 55),Alu_out,cy_frm_alu,z_frm_alu);
+        port map(pr3(31 downto 16),m6_out,cy_frm_ma,pr3(57 downto 55),Alu_out,cy_frm_alu,z_frm_alu);
 
         m1: mux4x1_1bit
         port Map(pr3(51),pr3(51),cy_old,z_old,pr3(59 downto 58),m1_out);
 
         pr4_reg: pr4
-        port map(ALU_out,m1_out,pr4_en,pr3(50 downto 48),pr3(52),pr3(61 downto 60),pr3(83 downto 68),pr3(99 downto 84),clk,pr4_reset, pr4_outt);
+        port map(ALU_out,m1_out,pr4_en,pr3(50 downto 48),pr3(52),pr3(61 downto 60),pr3(83 downto 68),pr3(99 downto 84),clk,pr4_reset,cy_to_ma,z_to_ma,pr4_outt);
 
         Dec_2: Decoder2
         port map(pr3(67 downto 64),cy_frm_alu,z_frm_alu,M7_control,M8_control,M9_control);
 
         b_haz: branch_hazard_detector
         port map(pr3(67 downto 64),cy_frm_alu,z_frm_alu,branch_haz);
+
+        m17: mux2x1_1bit
+        port map(cy_old,cy_frm_ma,pr3(53),cy_to_ma);
+
+        m18: mux2x1_1bit
+        port map(z_old,z_frm_ma,pr3(54),z_to_ma);
 
         REGA_data<=pr3(31 downto 16);
         --REGB_data<=pr3(47 downto 32);
@@ -133,6 +151,7 @@ architecture bhv_exec of execution is
         ALU_c_out<=ALU_out;
         M14_control<= pr3(63);
         ex_dest<=pr3(50 downto 48);
+
 
         ex_out <=pr4_outt;
 

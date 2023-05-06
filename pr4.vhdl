@@ -11,14 +11,15 @@ entity pr4 is
             PC_next:in std_logic_vector(15 downto 0);
             Ra_value:in std_logic_vector(15 downto 0);
 			clk: in std_logic;
-		reset: in std_logic;
-			pr4_out: out std_logic_vector(54 downto 0)); 
+			reset: in std_logic;
+			cy_to_ma,z_to_ma: in std_logic;
+			pr4_out: out std_logic_vector(56 downto 0)); 
 
 end entity;
 
 architecture behave_pr4 of pr4 is 
 
-signal reg_sig : std_logic_vector(54 downto 0):=(others => '0');  -- sign_ext control
+signal reg_sig : std_logic_vector(56 downto 0):=(others => '0');  -- sign_ext control
 
     
 begin 
@@ -34,6 +35,8 @@ begin
 				reg_sig(22 downto 21) <= m5_control;
 				reg_sig(38 downto 23)<= Pc_next;
 				reg_sig(54 downto 39)<= Ra_value;
+				reg_sig(55)<=cy_to_ma;
+				reg_sig(56)<=z_to_ma;
 			else
 				reg_sig <= reg_sig;	
 		    end if;

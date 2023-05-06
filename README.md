@@ -285,6 +285,8 @@
      6. M14 control bit 
      7. ALU out (16 bits for data forward)
      8. Destination address from PR3(3 bits for data forwarding)
+**note** :- ALU takes c,z flags from the next satge MEM ACC. and the CZ flag UPDATES in Write BACK stage. for all OPCODES Send forward the CZ flags generated and tehir correspondig EN bits.
+The alu give out CZ flags it depends on OPCODE if it gets stored or not so always send forward the present cz flag bits or the updated ones. Hence when we feedforward the CZ bits they will always be the updated ones so make the logic bits for the cz bits.
 ## Memory Access
 1. **PR4**
    1. 15-0 **ALU-C** (from ALU1 output)
